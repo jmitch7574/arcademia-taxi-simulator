@@ -1,0 +1,14 @@
+[remap]
+
+importer="image"
+type="Image"
+uid="uid://cxt1vmsicp023"
+path="res://.godot/imported/water.png-4cfdb011f1597591b095678ad1dbd40e.image"
+
+[deps]
+
+source_file="res://Sprites/water.png"
+dest_files=["res://.godot/imported/water.png-4cfdb011f1597591b095678ad1dbd40e.image"]
+
+[params]
+

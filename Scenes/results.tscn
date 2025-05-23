@@ -1,0 +1,304 @@
+[gd_scene load_steps=25 format=3 uid="uid://ccfmhmvc6o4qi"]
+
+[ext_resource type="Texture2D" uid="uid://chsrr3d3rrfty" path="res://Models/colormap.png" id="1_3iro3"]
+[ext_resource type="Script" uid="uid://b2smwd2oe165c" path="res://Scripts/ResultsUI.gd" id="1_fhw0o"]
+[ext_resource type="FontFile" uid="uid://mvjksgkkatqw" path="res://Fonts/joystix monospace.otf" id="1_i07ch"]
+[ext_resource type="LabelSettings" uid="uid://c5g8uqpck01vg" path="res://Ranks/S-Rank.tres" id="2_a5rne"]
+[ext_resource type="Shader" uid="uid://dgub333v0e0hi" path="res://Shaders/outline.gdshader" id="2_txdwj"]
+[ext_resource type="ArrayMesh" uid="uid://34xjicpesaog" path="res://Models/taxi.obj" id="3_av73q"]
+[ext_resource type="LabelSettings" uid="uid://ceprwlayxyw6f" path="res://Ranks/A-Rank.tres" id="3_t6hrj"]
+[ext_resource type="LabelSettings" uid="uid://cnjmowpxtfrte" path="res://Ranks/B-Rank.tres" id="4_bifex"]
+[ext_resource type="Material" uid="uid://bow2mcxe5vi27" path="res://Material/grass.tres" id="4_txdwj"]
+[ext_resource type="Material" uid="uid://8uprxpao80pn" path="res://Material/water.tres" id="5_av73q"]
+[ext_resource type="LabelSettings" uid="uid://bvnws2rxbwxcd" path="res://Ranks/C-Rank.tres" id="5_uej53"]
+[ext_resource type="LabelSettings" uid="uid://dcx8ixfc7dess" path="res://Ranks/D-Rank.tres" id="6_vjmih"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_i07ch"]
+font = ExtResource("1_i07ch")
+font_size = 32
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 12
+shadow_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_fhw0o"]
+font_size = 32
+font_color = Color(0.997468, 0.676328, 1.15514e-06, 1)
+outline_size = 2
+shadow_size = 5
+shadow_color = Color(0.257924, 0.166606, 0.0193652, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_0jydw"]
+font_size = 32
+shadow_size = 12
+shadow_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_32gje"]
+font = ExtResource("1_i07ch")
+font_size = 250
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 12
+shadow_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_a5rne"]
+font = ExtResource("1_i07ch")
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 6
+shadow_color = Color(0, 0, 0, 1)
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_i07ch"]
+
+[sub_resource type="Sky" id="Sky_btdjb"]
+sky_material = SubResource("ProceduralSkyMaterial_i07ch")
+
+[sub_resource type="Environment" id="Environment_fhw0o"]
+background_mode = 2
+sky = SubResource("Sky_btdjb")
+sky_rotation = Vector3(0, 0, -0.715585)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hgjej"]
+render_priority = 0
+shader = ExtResource("2_txdwj")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0jydw"]
+next_pass = SubResource("ShaderMaterial_hgjej")
+shading_mode = 2
+diffuse_mode = 3
+specular_mode = 1
+albedo_texture = ExtResource("1_3iro3")
+metallic_specular = 0.0
+roughness = 0.1
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_txdwj"]
+material = ExtResource("4_txdwj")
+size = Vector2(25, 25)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_av73q"]
+material = ExtResource("5_av73q")
+size = Vector2(300, 300)
+
+[node name="Control" type="Node3D"]
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_fhw0o")
+s_style = ExtResource("2_a5rne")
+a_style = ExtResource("3_t6hrj")
+b_style = ExtResource("4_bifex")
+c_style = ExtResource("5_uej53")
+d_style = ExtResource("6_vjmih")
+
+[node name="ColorRect" type="ColorRect" parent="UI"]
+layout_mode = 0
+offset_left = 49.0
+offset_top = 29.0
+offset_right = 600.0
+offset_bottom = 662.0
+color = Color(0.813258, 0.813258, 0.813258, 1)
+
+[node name="FinalResults" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 45.0
+offset_right = 406.0
+offset_bottom = 119.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_i07ch")
+theme_override_font_sizes/font_size = 32
+text = "FINAL RESULTS"
+label_settings = SubResource("LabelSettings_i07ch")
+
+[node name="MoneyTitle" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 115.0
+offset_right = 235.0
+offset_bottom = 189.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_i07ch")
+theme_override_font_sizes/font_size = 32
+text = "MONEY:"
+label_settings = SubResource("LabelSettings_i07ch")
+
+[node name="MoneyAmount" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 417.0
+offset_top = 115.0
+offset_right = 576.0
+offset_bottom = 189.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_i07ch")
+theme_override_font_sizes/font_size = 32
+text = "$15"
+label_settings = SubResource("LabelSettings_fhw0o")
+horizontal_alignment = 2
+
+[node name="FaresTitle" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 177.0
+offset_right = 235.0
+offset_bottom = 251.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_i07ch")
+theme_override_font_sizes/font_size = 32
+text = "Fares Made:"
+label_settings = SubResource("LabelSettings_i07ch")
+
+[node name="FareAmount" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 417.0
+offset_top = 177.0
+offset_right = 576.0
+offset_bottom = 251.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_i07ch")
+theme_override_font_sizes/font_size = 32
+text = "2"
+label_settings = SubResource("LabelSettings_0jydw")
+horizontal_alignment = 2
+
+[node name="RankTitle" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 292.0
+offset_right = 235.0
+offset_bottom = 366.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_i07ch")
+theme_override_font_sizes/font_size = 32
+text = "RANK:"
+label_settings = SubResource("LabelSettings_i07ch")
+
+[node name="FinalRank" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 344.0
+offset_top = 234.0
+offset_right = 582.0
+offset_bottom = 534.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_i07ch")
+theme_override_font_sizes/font_size = 32
+text = "A"
+label_settings = SubResource("LabelSettings_32gje")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="S-example" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = -464.0
+offset_top = 1.0
+offset_right = -226.0
+offset_bottom = 301.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_i07ch")
+theme_override_font_sizes/font_size = 32
+text = "S"
+label_settings = ExtResource("2_a5rne")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="S-example2" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = -467.0
+offset_top = 258.0
+offset_right = -229.0
+offset_bottom = 558.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_i07ch")
+theme_override_font_sizes/font_size = 32
+text = "A"
+label_settings = ExtResource("3_t6hrj")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="S-example3" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = -470.0
+offset_top = 529.0
+offset_right = -232.0
+offset_bottom = 829.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_i07ch")
+theme_override_font_sizes/font_size = 32
+text = "B"
+label_settings = ExtResource("4_bifex")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="S-example4" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = -473.0
+offset_top = 791.0
+offset_right = -235.0
+offset_bottom = 1091.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_i07ch")
+theme_override_font_sizes/font_size = 32
+text = "C"
+label_settings = ExtResource("5_uej53")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="S-example5" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = -478.0
+offset_top = 1059.0
+offset_right = -240.0
+offset_bottom = 1359.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_i07ch")
+theme_override_font_sizes/font_size = 32
+text = "D"
+label_settings = ExtResource("6_vjmih")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ExitHint" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 58.0
+offset_top = 603.0
+offset_right = 565.0
+offset_bottom = 647.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("1_i07ch")
+theme_override_font_sizes/font_size = 32
+text = "Press D for Main Menu"
+label_settings = SubResource("LabelSettings_a5rne")
+vertical_alignment = 2
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_fhw0o")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 52.0034, 0)
+shadow_enabled = true
+directional_shadow_mode = 0
+directional_shadow_split_1 = 0.665
+directional_shadow_split_2 = 0.79
+directional_shadow_split_3 = 1.0
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 1000.0
+
+[node name="TaxiPrefab" type="Node3D" parent="."]
+transform = Transform3D(0.615331, 0, 0.788269, 0, 1, 0, -0.788269, 0, 0.615331, 0, -0.603, 0)
+
+[node name="TaxiCamera" type="Camera3D" parent="TaxiPrefab"]
+transform = Transform3D(-0.766471, 0, -0.642279, 0, 1, 0, 0.642279, 0, -0.766471, -1.71481, 3.83995, -8.34658)
+current = true
+
+[node name="Mesh" type="MeshInstance3D" parent="TaxiPrefab"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74683, 0)
+material_override = SubResource("StandardMaterial3D_0jydw")
+mesh = ExtResource("3_av73q")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.08312, 0.0202761, -8.08479)
+mesh = SubResource("PlaneMesh_txdwj")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.0704, -0.72934, -8.1233)
+mesh = SubResource("PlaneMesh_av73q")

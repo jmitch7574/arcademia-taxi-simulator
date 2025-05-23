@@ -1,0 +1,20 @@
+[gd_resource type="Theme" load_steps=4 format=3 uid="uid://cxaexq662bjtg"]
+
+[ext_resource type="FontFile" uid="uid://mvjksgkkatqw" path="res://Fonts/joystix monospace.otf" id="1_ejpoj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4ywt0"]
+bg_color = Color(0.814358, 0.526314, 0.219822, 0.513726)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ejpoj"]
+bg_color = Color(0.440546, 0.0103164, 0.109217, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.794011, 0.608018, 1.92523e-07, 1)
+
+[resource]
+Button/font_sizes/font_size = 16
+Button/fonts/font = ExtResource("1_ejpoj")
+Button/styles/focus = SubResource("StyleBoxFlat_4ywt0")
+Button/styles/normal = SubResource("StyleBoxFlat_ejpoj")
