@@ -1,0 +1,48 @@
+[gd_scene load_steps=8 format=3 uid="uid://c2qe472gc2y8l"]
+
+[ext_resource type="Script" uid="uid://dx5wt0j425npw" path="res://Scripts/Generation/Generator.gd" id="1_qry3u"]
+[ext_resource type="Script" uid="uid://e6lshyqfenrn" path="res://Scripts/DebugCamera.gd" id="2_3ql1u"]
+[ext_resource type="Material" uid="uid://b1t3tceuhh3mq" path="res://Material/water.tres" id="3_btdjb"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_3ql1u"]
+
+[sub_resource type="Sky" id="Sky_btdjb"]
+sky_material = SubResource("ProceduralSkyMaterial_3ql1u")
+
+[sub_resource type="Environment" id="Environment_3ql1u"]
+background_mode = 2
+sky = SubResource("Sky_btdjb")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_duywi"]
+material = ExtResource("3_btdjb")
+size = Vector2(100000, 100000)
+subdivide_width = 32
+subdivide_depth = 32
+
+[node name="gameroot" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_3ql1u")
+
+[node name="worldroot" type="Node3D" parent="."]
+
+[node name="Generator" type="Node3D" parent="worldroot"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+script = ExtResource("1_qry3u")
+
+[node name="Anchor" type="Node3D" parent="worldroot/Generator"]
+
+[node name="Camera3D" type="Camera3D" parent="worldroot"]
+script = ExtResource("2_3ql1u")
+base_move_speed = 5.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="worldroot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25000, -3, -25000)
+mesh = SubResource("PlaneMesh_duywi")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.0329459, 0.873561, 0.485599, 0, 0.485863, -0.874035, -0.999457, -0.0287959, -0.0160072, 0, 52.0034, 0)
+light_energy = 2.0
+directional_shadow_mode = 0
+
+[connection signal="file_loaded" from="worldroot/Generator" to="worldroot/Camera3D" method="_on_generator_file_loaded"]
