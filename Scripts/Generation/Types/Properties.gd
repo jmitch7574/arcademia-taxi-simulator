@@ -11,3 +11,4 @@ var surface : String
 var lanes : int
 var railway : String
 var ref : String
+var bridge : String

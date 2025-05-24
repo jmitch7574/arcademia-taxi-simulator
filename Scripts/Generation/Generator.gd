@@ -35,7 +35,7 @@ func generate_paths():
 				path_total.add_child(path)
 				
 	for linestring in FileLoader.loaded_lines:
-		if ["pedestrian", "steps", "footway"].has(linestring.properties.highway) and linestring.properties.layer < 1:
+		if ["pedestrian", "steps", "footway"].has(linestring.properties.highway) and linestring.properties.bridge != "yes":
 			var poly = linestring.geometry.as_polygon(2)
 			for discrete_poly in poly:
 				var path = CSGPolygon3D.new()
@@ -44,7 +44,7 @@ func generate_paths():
 				path.material = GRAVEL
 				path_total.add_child(path)
 			continue
-		if ["primary", "secondary", "tertiary", "unclassified", "service", "residential", "unclassified", "trunk"].has(linestring.properties.highway) and linestring.properties.layer < 1:
+		if ["primary", "secondary", "tertiary", "unclassified", "service", "residential", "unclassified", "trunk"].has(linestring.properties.highway) and linestring.properties.bridge != "yes":
 			var poly = linestring.geometry.as_polygon(2.5 * min(linestring.properties.lanes, 2))
 			for discrete_poly in poly:
 				var path = CSGPolygon3D.new()
@@ -68,27 +68,31 @@ func generate_paths():
 	add_child(rail_total)
 
 func generate_bridges():
-	var ignored : Array[int] = []
-	for i  in range(len(FileLoader.loaded_lines)):
-		if i in ignored:
-			continue
-		var linestring = FileLoader.loaded_lines[i]
-		
-		if linestring.properties.layer >= 1:
-			var complete_line : PackedVector2Array = []
-			complete_line.append_array(linestring.geometry.coordinates)
-			ignored.append(i)
+	for linestring in FileLoader.loaded_lines:
+		if linestring.properties.bridge == "yes":
+			var path3D = Path3D.new()
+			path3D.curve = Curve3D.new()
+			var coords = linestring.geometry.coordinates
+			path3D.curve.add_point(Vector3(coords[0].x, 0, coords[0].y))
+			for k in range(1, len(coords) - 1):
+				path3D.curve.add_point(Vector3(coords[k].x, 5, coords[k].y))
+			path3D.curve.add_point(Vector3(coords[-1].x, 0, coords[-1].y))
 			
-			for j  in range(len(FileLoader.loaded_lines)):
-				if i == j:
-					continue
-				var second_linestring = FileLoader.loaded_lines[j]
-				if complete_line[0] == second_linestring.geometry.coordinates[-1]:
-					complete_line = second_linestring.geometry.coordinates + complete_line
-					ignored.append(j)
-				if complete_line[-1] == second_linestring.geometry.coordinates[0]:
-					complete_line =  complete_line + second_linestring.geometry.coordinates
-					ignored.append(j)
+			var poly = CSGPolygon3D.new()
+			poly.mode = CSGPolygon3D.MODE_PATH
+			poly.path_interval = 0.5
+			poly.path_simplify_angle = 6.0
+			poly.path_rotation = true
+			poly.polygon = [
+				Vector2(-0.5, -0.5),
+				Vector2(0.5, -0.5),
+				Vector2(0.5, 0.5),
+				Vector2(-0.5, 0.5),
+			]
+			
+			path3D.add_child(poly)
+			add_child(path3D)
+			poly.path_node = poly.get_path_to(path3D)
 
 func generate_buildings():
 	var building_container = Node3D.new()
