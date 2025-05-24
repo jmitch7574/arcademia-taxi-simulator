@@ -37,7 +37,6 @@ func _ready() -> void:
 	file_loaded.emit()
 	event.emit("Done")
 	
-	bake_csgs_recursive(WorldOrigin)
 	assign_ownership_recursive(WorldOrigin, WorldOrigin)
 	
 	var scene = PackedScene.new()
@@ -64,60 +63,40 @@ func generate_spawn():
 	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
 
 func generate_paths():
-	var path_total = CSGCombiner3D.new()
-	var road_total = CSGCombiner3D.new()
-	var rail_total = CSGCombiner3D.new()
+	var path_total = Node3D.new()
+	path_total.name = "PATHS"
+	var road_total = Node3D.new()
+	road_total.name = "ROADS"
+	var rail_total = Node3D.new()
+	rail_total.name = "RAILS"
 	
 	for multipoly in FileLoader.loaded_multipolys:
 		if ["pedestrian", "steps", "footway"].has(multipoly.properties.highway):
 			for poly in multipoly.geometry.coordinates:
-				var path = CSGPolygon3D.new()
-				path.polygon = poly
-				path.depth = 5.01
-				path.material = GRAVEL
-				path.operation = CSGPolygon3D.OPERATION_UNION
-				path_total.add_child(path)
+				path_total.add_child(create_extruded_polygon(poly, 5.01, GRAVEL))
 				
 	for linestring in FileLoader.loaded_lines:
 		if ["pedestrian", "steps", "footway"].has(linestring.properties.highway) and linestring.properties.bridge != "yes":
 			var poly = linestring.geometry.as_polygon(2)
 			for discrete_poly in poly:
-				var path = CSGPolygon3D.new()
-				path.polygon = discrete_poly
-				path.depth = 5.01
-				path.material = GRAVEL
-				path.operation = CSGPolygon3D.OPERATION_UNION
-				path_total.add_child(path)
+				path_total.add_child(create_extruded_polygon(poly, 5.01, GRAVEL))
 			continue
 		if ["primary", "secondary", "tertiary", "unclassified", "service", "residential", "unclassified", "trunk"].has(linestring.properties.highway) and linestring.properties.bridge != "yes":
 			var poly = linestring.geometry.as_polygon(2.5 * min(linestring.properties.lanes, 2))
 			for discrete_poly in poly:
-				var path = CSGPolygon3D.new()
-				path.polygon = discrete_poly
-				path.depth = 5.02
-				path.material = ROAD
-				path.operation = CSGPolygon3D.OPERATION_UNION
-				road_total.add_child(path)
+				road_total.add_child(create_extruded_polygon(discrete_poly, 5.1, ROAD))
 			continue
 		if linestring.properties.railway != "-1" and linestring.properties.ref != "NOB4" and "Line" in linestring.properties.name:
 			var poly = linestring.geometry.as_polygon(3)
 			for discrete_poly in poly:
-				var path = CSGPolygon3D.new()
-				path.polygon = discrete_poly
-				path.depth = 5.03
-				path.material = RAIL
-				path.operation = CSGPolygon3D.OPERATION_UNION
-				rail_total.add_child(path)
+				rail_total.add_child(create_extruded_polygon(discrete_poly, 5.05, RAIL))
 			continue
 		
 	WorldOrigin.add_child(path_total)
-	path_total.use_collision = true
 	event.emit("Loaded Paths")
 	WorldOrigin.add_child(road_total)
-	road_total.use_collision = true
 	event.emit("Loaded Roads")
 	WorldOrigin.add_child(rail_total)
-	rail_total.use_collision = true
 	event.emit("Loaded Rails")
 
 func generate_bridges():
@@ -241,13 +220,7 @@ func generate_buildings():
 	for building in FileLoader.loaded_multipolys:
 		if building.properties.building != "-1" or building.properties.building != "-1":
 			for poly in building.geometry.coordinates:
-				var building_csg = CSGPolygon3D.new()
-				building_csg.polygon = poly
-				building_csg.operation = CSGPolygon3D.OPERATION_UNION
-				building_csg.depth = pow(polygon_area(poly), 0.22) * 3
-				building_csg.material = BUILDING
-				building_csg.use_collision = true
-				building_container.add_child(building_csg)
+				building_container.add_child(create_extruded_polygon(poly, pow(polygon_area(poly), 0.22) * 3, BUILDING))
 	
 	building_container.global_position.z = -5
 	building_container.name = "BUILDINGS"
@@ -265,6 +238,7 @@ func polygon_area(points: PackedVector2Array) -> float:
 func generate_terrain():
 	var base_terrain = CSGCombiner3D.new()
 	var water_total = CSGCombiner3D.new()
+	
 	
 	var grass = CSGPolygon3D.new()
 	grass.polygon = PackedVector2Array([
@@ -305,42 +279,107 @@ func generate_terrain():
 	base_terrain.add_child(grass)
 	water_total.operation = CSGShape3D.OPERATION_SUBTRACTION
 	base_terrain.add_child(water_total)
-	base_terrain.use_collision = true
 	
 	
 	base_terrain.material_override = GRASS
+	base_terrain.use_collision = true
 	base_terrain.name = "TERRAIN"
 	WorldOrigin.add_child(base_terrain)
 
 func gen_step():
 	await get_tree().process_frame
 
-func bake_csg_to_static(csg: CSGShape3D):
-	# Bake mesh from CSG
-	var mesh = csg.bake_static_mesh()
-	var mesh_instance = MeshInstance3D.new()
+func create_extruded_polygon(polygon: PackedVector2Array, height: float, material : Material) -> Node3D:
+	var node := Node3D.new()
+
+	# Create the Mesh
+	var mesh := ArrayMesh.new()
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+
+	# Top and bottom faces
+	var top := []
+	var bottom := []
+	for point in polygon:
+		top.append(Vector3(point.x, point.y, -height))
+		bottom.append(Vector3(point.x, point.y, 0))
+
+	# Triangulate the top face
+	var indices := Geometry2D.triangulate_polygon(polygon)
+	for i in range(0, indices.size(), 3):
+		var i0 = indices[i]
+		var i1 = indices[i + 1]
+		var i2 = indices[i + 2]
+
+		var v0 = top[i0]
+		var v1 = top[i1]
+		var v2 = top[i2]
+
+		st.set_uv(Vector2(v0.x, v0.z))
+		st.add_vertex(v0)
+		st.set_uv(Vector2(v1.x, v1.z))
+		st.add_vertex(v1)
+		st.set_uv(Vector2(v2.x, v2.z))
+		st.add_vertex(v2)
+
+		# Bottom face (inverted winding)
+		var bv0 = bottom[i2]
+		var bv1 = bottom[i1]
+		var bv2 = bottom[i0]
+
+		st.set_uv(Vector2(bv0.x, bv0.z))
+		st.add_vertex(bv0)
+		st.set_uv(Vector2(bv1.x, bv1.z))
+		st.add_vertex(bv1)
+		st.set_uv(Vector2(bv2.x, bv2.z))
+		st.add_vertex(bv2)
+
+	# Side faces
+	var n := polygon.size()
+	for i in range(n):
+		var next := (i + 1) % n
+
+		var p0 = bottom[i]
+		var p1 = bottom[next]
+		var p2 = top[next]
+		var p3 = top[i]
+
+		var u0 = float(i) / n
+		var u1 = float(i + 1) / n
+
+		# First triangle
+		st.set_uv(Vector2(u0, 0))
+		st.add_vertex(p0)
+		st.set_uv(Vector2(u1, 1))
+		st.add_vertex(p2)
+		st.set_uv(Vector2(u1, 0))
+		st.add_vertex(p1)
+
+		# Second triangle
+		st.set_uv(Vector2(u0, 0))
+		st.add_vertex(p0)
+		st.set_uv(Vector2(u0, 1))
+		st.add_vertex(p3)
+		st.set_uv(Vector2(u1, 1))
+		st.add_vertex(p2)
+
+	st.generate_normals()
+	mesh = st.commit()
+
+	var mesh_instance := MeshInstance3D.new()
 	mesh_instance.mesh = mesh
-	mesh_instance.global_transform = csg.global_transform
+	node.add_child(mesh_instance)
+	
+	mesh_instance.material_override = material
 
-	# Create StaticBody3D with collision
-	var static_body = StaticBody3D.new()
-	static_body.global_transform = csg.global_transform
+	# Collision
+	var col_shape := ConcavePolygonShape3D.new()
+	col_shape.set_faces(mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX])
+	
+	var static_body := StaticBody3D.new()
+	var collision := CollisionShape3D.new()
+	collision.shape = col_shape
+	static_body.add_child(collision)
+	node.add_child(static_body)
 
-	var collider = CollisionShape3D.new()
-	collider.shape = csg.bake_collision_shape()
-	static_body.add_child(collider)
-
-	# Add baked objects to the scene
-	csg.get_parent().add_child(mesh_instance)
-	csg.get_parent().add_child(static_body)
-
-	# Optional: Remove the original CSG
-	csg.queue_free()
-
-
-func bake_csgs_recursive(root: Node):
-	for child in root.get_children():
-		if child is CSGShape3D:
-			bake_csg_to_static(child)
-		else:
-			bake_csgs_recursive(child)
+	return node
