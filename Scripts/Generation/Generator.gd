@@ -68,29 +68,118 @@ func generate_paths():
 	add_child(rail_total)
 
 func generate_bridges():
+	var bridges = Node3D.new()
 	for linestring in FileLoader.loaded_lines:
 		if linestring.properties.bridge == "yes" and ["primary", "secondary", "tertiary", "unclassified", "service", "residential", "unclassified", "trunk"].has(linestring.properties.highway):
-			var path3D = Path3D.new()
-			path3D.curve = Curve3D.new()
+			var path = Path3D.new()
+			path.curve = Curve3D.new()
 			var coords = linestring.geometry.coordinates
-			path3D.curve.add_point(Vector3(coords[0].x, coords[0].y, 0))
-			for k in range(1, len(coords) - 1):
-				path3D.curve.add_point(Vector3(coords[k].x, coords[k].y, 5))
-			path3D.curve.add_point(Vector3(coords[-1].x, coords[-1].y, 0))
+			for k in range(0, floor(len(coords) / 2)):
+				var t = float(k) / float(coords.size() - 1)
+				var bridge_height = sin(t * PI) * min(2 * len(coords), 20)
+				path.curve.add_point(Vector3(coords[k].x, bridge_height, coords[k].y))
+			for k in range(floor(len(coords) / 2),  len(coords)):
+				var t = float(k) / float(coords.size() - 1)
+				var bridge_height = sin(t * PI) * min(2 * len(coords), 20)
+				path.curve.add_point(Vector3(coords[k].x, bridge_height, coords[k].y))
+		
 			
-			var poly = CSGPolygon3D.new()
-			poly.mode = CSGPolygon3D.MODE_PATH
-			poly.path_interval = 0.5
-			poly.polygon = [
-				Vector2(-5, -0.5),
-				Vector2(5, -0.5),
-				Vector2(5, 0.5),
-				Vector2(-5, 0.5),
-			]
-			
-			path3D.add_child(poly)
-			add_child(path3D)
-			poly.path_node = poly.get_path_to(path3D)
+			var curve : Curve3D = path.curve
+			var st := SurfaceTool.new()
+			st.begin(Mesh.PRIMITIVE_TRIANGLES)
+
+			var points := []
+			var d := 0.0
+			while d < curve.get_baked_length():
+				points.append(curve.sample_baked(d))
+				d += 2
+
+			# Compute center offset
+			var center := Vector3.ZERO
+			for p in points:
+				center += p
+			center /= points.size()
+
+			var width = 6.0
+			var height = 3
+
+			for i in range(points.size() - 1):
+				var p1 = points[i] - center
+				var p2 = points[i + 1] - center
+
+				p1 = p1 + (p1 - p2) * 0.1
+				p2 = p2 + (p2 - p1) * 0.1
+
+				var forward = (p2 - p1).normalized()
+				var up = Vector3.UP
+				var right = forward.cross(up).normalized() * width
+
+				# Top vertices
+				var v1a = p1 - right
+				var v1b = p1 + right
+				var v2a = p2 - right
+				var v2b = p2 + right
+
+				# Bottom vertices (lowered by height)
+				var v1a_b = v1a - up * height
+				var v1b_b = v1b - up * height
+				var v2a_b = v2a - up * height
+				var v2b_b = v2b - up * height
+
+				var normal_up = Vector3.UP
+				var normal_down = -Vector3.UP
+				var normal_left = -right.normalized()
+				var normal_right = right.normalized()
+
+				# --- Top Face (road surface)
+				st.add_vertex(v1a)
+				st.add_vertex(v2a)
+				st.add_vertex(v2b)
+
+				st.add_vertex(v1a)
+				st.add_vertex(v2b)
+				st.add_vertex(v1b)
+
+				# --- Bottom Face (underside)
+				st.add_vertex(v1b_b)
+				st.add_vertex(v2b_b)
+				st.add_vertex(v2a_b)
+
+				st.add_vertex(v1b_b)
+				st.add_vertex(v2a_b)
+				st.add_vertex(v1a_b)
+
+				# --- Left Face
+				st.add_vertex(v1a_b)
+				st.add_vertex(v2a_b)
+				st.add_vertex(v2a)
+
+				st.add_vertex(v1a_b)
+				st.add_vertex(v2a)
+				st.add_vertex(v1a)
+
+				# --- Right Face
+				st.add_vertex(v1b)
+				st.add_vertex(v2b)
+				st.add_vertex(v2b_b)
+
+				st.add_vertex(v1b)
+				st.add_vertex(v2b_b)
+				st.add_vertex(v1b_b)
+
+			# Commit mesh
+			var mesh := st.commit()
+			mesh.surface_set_material(0, ROAD)
+
+			# Create MeshInstance3D at center
+			var mesh_instance := MeshInstance3D.new()
+			mesh_instance.mesh = mesh
+			mesh_instance.position = center
+			bridges.add_child(mesh_instance)
+	
+	bridges.rotation_degrees = Vector3(-90, 0, 0)
+	bridges.position.z = -5
+	add_child(bridges)
 
 func generate_buildings():
 	var building_container = Node3D.new()
