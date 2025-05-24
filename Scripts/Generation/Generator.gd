@@ -69,25 +69,23 @@ func generate_paths():
 
 func generate_bridges():
 	for linestring in FileLoader.loaded_lines:
-		if linestring.properties.bridge == "yes":
+		if linestring.properties.bridge == "yes" and ["primary", "secondary", "tertiary", "unclassified", "service", "residential", "unclassified", "trunk"].has(linestring.properties.highway):
 			var path3D = Path3D.new()
 			path3D.curve = Curve3D.new()
 			var coords = linestring.geometry.coordinates
-			path3D.curve.add_point(Vector3(coords[0].x, 0, coords[0].y))
+			path3D.curve.add_point(Vector3(coords[0].x, coords[0].y, 0))
 			for k in range(1, len(coords) - 1):
-				path3D.curve.add_point(Vector3(coords[k].x, 5, coords[k].y))
-			path3D.curve.add_point(Vector3(coords[-1].x, 0, coords[-1].y))
+				path3D.curve.add_point(Vector3(coords[k].x, coords[k].y, 5))
+			path3D.curve.add_point(Vector3(coords[-1].x, coords[-1].y, 0))
 			
 			var poly = CSGPolygon3D.new()
 			poly.mode = CSGPolygon3D.MODE_PATH
 			poly.path_interval = 0.5
-			poly.path_simplify_angle = 6.0
-			poly.path_rotation = true
 			poly.polygon = [
-				Vector2(-0.5, -0.5),
-				Vector2(0.5, -0.5),
-				Vector2(0.5, 0.5),
-				Vector2(-0.5, 0.5),
+				Vector2(-5, -0.5),
+				Vector2(5, -0.5),
+				Vector2(5, 0.5),
+				Vector2(-5, 0.5),
 			]
 			
 			path3D.add_child(poly)
