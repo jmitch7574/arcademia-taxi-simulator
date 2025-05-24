@@ -37,6 +37,7 @@ func _ready() -> void:
 	file_loaded.emit()
 	event.emit("Done")
 	
+	bake_csgs_recursive(WorldOrigin)
 	assign_ownership_recursive(WorldOrigin, WorldOrigin)
 	
 	var scene = PackedScene.new()
@@ -128,11 +129,11 @@ func generate_bridges():
 			var coords = linestring.geometry.coordinates
 			for k in range(0, floor(len(coords) / 2)):
 				var t = float(k) / float(coords.size() - 1)
-				var bridge_height = sin(t * PI) * min(2 * len(coords), 20)
+				var bridge_height = sin(t * PI) * min(len(coords), 15)
 				path.curve.add_point(Vector3(coords[k].x, bridge_height, coords[k].y))
 			for k in range(floor(len(coords) / 2),  len(coords)):
 				var t = float(k) / float(coords.size() - 1)
-				var bridge_height = sin(t * PI) * min(2 * len(coords), 20)
+				var bridge_height = sin(t * PI) * min(len(coords), 15)
 				path.curve.add_point(Vector3(coords[k].x, bridge_height, coords[k].y))
 		
 			
@@ -313,3 +314,33 @@ func generate_terrain():
 
 func gen_step():
 	await get_tree().process_frame
+
+func bake_csg_to_static(csg: CSGShape3D):
+	# Bake mesh from CSG
+	var mesh = csg.bake_static_mesh()
+	var mesh_instance = MeshInstance3D.new()
+	mesh_instance.mesh = mesh
+	mesh_instance.global_transform = csg.global_transform
+
+	# Create StaticBody3D with collision
+	var static_body = StaticBody3D.new()
+	static_body.global_transform = csg.global_transform
+
+	var collider = CollisionShape3D.new()
+	collider.shape = csg.bake_collision_shape()
+	static_body.add_child(collider)
+
+	# Add baked objects to the scene
+	csg.get_parent().add_child(mesh_instance)
+	csg.get_parent().add_child(static_body)
+
+	# Optional: Remove the original CSG
+	csg.queue_free()
+
+
+func bake_csgs_recursive(root: Node):
+	for child in root.get_children():
+		if child is CSGShape3D:
+			bake_csg_to_static(child)
+		else:
+			bake_csgs_recursive(child)

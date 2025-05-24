@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://citpyjnjhqwd0"]
+[gd_scene load_steps=6 format=3 uid="uid://citpyjnjhqwd0"]
 
 [ext_resource type="Texture2D" uid="uid://bounmhwd6s4j7" path="res://Sprites/ATS.webp" id="1_tt5f1"]
 [ext_resource type="Script" uid="uid://boq4a600x8t4j" path="res://Scripts/MainMenu/StartScreen/Play.gd" id="2_853f1"]
 [ext_resource type="Script" uid="uid://ckxbg2mub1djk" path="res://Scripts/MainMenu/StartScreen/Quit.gd" id="3_ghw46"]
 [ext_resource type="Script" uid="uid://qo1obp4hwjlk" path="res://Scripts/MainMenu/StartScreen/Generator.gd" id="4_df05h"]
+[ext_resource type="Script" uid="uid://08obhi3do8qc" path="res://Scripts/MainMenu/TestScene.gd" id="5_df05h"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -57,5 +58,15 @@ offset_bottom = 305.5
 text = "GENERATOR"
 script = ExtResource("4_df05h")
 
+[node name="TEST SCENE" type="Button" parent="MainMenuSlide/Start"]
+layout_mode = 0
+offset_left = 278.643
+offset_top = 314.469
+offset_right = 391.643
+offset_bottom = 345.469
+text = "TEST SCENE"
+script = ExtResource("5_df05h")
+
 [connection signal="pressed" from="MainMenuSlide/Start/PLAY" to="MainMenuSlide/Start/PLAY" method="_on_pressed"]
 [connection signal="pressed" from="MainMenuSlide/Start/GENERATOR" to="MainMenuSlide/Start/GENERATOR" method="_on_pressed"]
+[connection signal="pressed" from="MainMenuSlide/Start/TEST SCENE" to="MainMenuSlide/Start/TEST SCENE" method="_on_pressed"]
