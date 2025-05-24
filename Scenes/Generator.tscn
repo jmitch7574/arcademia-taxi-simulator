@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=3 uid="uid://lvwwb7r05irj"]
+
+[ext_resource type="Script" uid="uid://dx5wt0j425npw" path="res://Scripts/Generation/Generator.gd" id="1_xt47f"]
+[ext_resource type="Script" uid="uid://e6lshyqfenrn" path="res://Scripts/DebugCamera.gd" id="2_h1ad4"]
+[ext_resource type="Script" uid="uid://2qhlpmpywhj3" path="res://Scripts/Generation/StoredWorldInfo.gd" id="2_prkig"]
+[ext_resource type="Script" uid="uid://cfallqjcwjag0" path="res://Scripts/Generation/notices.gd" id="3_wx41w"]
+
+[node name="Generator" type="Node3D"]
+script = ExtResource("1_xt47f")
+
+[node name="Anchor" type="Node3D" parent="."]
+
+[node name="WorldOrigin" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+script = ExtResource("2_prkig")
+metadata/_custom_type_script = "uid://2qhlpmpywhj3"
+
+[node name="GeneratorCamera" type="Camera3D" parent="."]
+script = ExtResource("2_h1ad4")
+base_move_speed = 5.0
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Notices" type="VBoxContainer" parent="UI"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 6.0
+offset_right = 180.0
+offset_bottom = 359.0
+alignment = 2
+script = ExtResource("3_wx41w")
+
+[connection signal="event" from="." to="UI/Notices" method="_on_generator_event"]

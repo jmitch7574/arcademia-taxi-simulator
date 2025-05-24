@@ -6,12 +6,18 @@ static var loaded_multipolys : Array[GeoJsonMultiPolyogn]
 
 static var reference_coord : Vector2
 static var bbox: Vector4
+static var worldName : String
 
 signal file_loaded
 
 static func load_file(path_name: String) -> void:
 	var file := FileAccess.open(path_name, FileAccess.READ)
 	var content := file.get_as_text()
+	var file_name = path_name.get_file()
+	
+	var stripped = file_name.replace(".geojson", "").capitalize()
+	
+	worldName = stripped
 	
 	var parsed_content = JSON.parse_string(content)
 	
@@ -78,19 +84,19 @@ static func parse_properties(feature) -> GeoJsonProperties:
 	
 	var feat_props : Dictionary = feature["properties"]
 	
-	new_props.building = feat_props.get("building", "-1")
-	new_props.layer = feat_props.get("layer", -1)
-	new_props.name = feat_props.get("name", "-1")
-	new_props.natural = feat_props.get("natural", "-1")
-	new_props.water = feat_props.get("water", "-1")
-	new_props.waterway = feat_props.get("waterway", "-1")
-	new_props.highway = feat_props.get("highway", "-1")
-	new_props.lanes = feat_props.get("lanes", 2)
-	new_props.railway = feat_props.get("railway", "-1")
-	new_props.ref = feat_props.get("ref", "-1")
-	new_props.bridge = feat_props.get("bridge", "no")
+	new_props.building = get_value(feat_props, "building", "-1")
+	new_props.layer = get_value(feat_props, "layer", -1)
+	new_props.name = get_value(feat_props, "name", "-1")
+	new_props.natural = get_value(feat_props, "natural", "-1")
+	new_props.water = get_value(feat_props, "water", "-1")
+	new_props.waterway = get_value(feat_props, "waterway", "-1")
+	new_props.highway = get_value(feat_props, "highway", "-1")
+	new_props.lanes = get_value(feat_props, "lanes", 2)
+	new_props.railway = get_value(feat_props, "railway", "-1")
+	new_props.ref = get_value(feat_props, "ref", "-1")
+	new_props.bridge = get_value(feat_props, "bridge", "no")
 	
 	return new_props
 
 static func get_value(dict : Dictionary, key, default):
-	return dict.get(key, default)
+	return dict.get(key, default) if dict.get(key, default) != null else default

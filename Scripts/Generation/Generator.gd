@@ -9,16 +9,58 @@ const ROAD = preload("res://Material/road.tres")
 const RAIL = preload("res://Material/rail.tres")
 
 @onready var anchor: Node3D = $Anchor
+@onready var WorldOrigin: StoredWorldInfo = $WorldOrigin
+var step := 0
+
 signal file_loaded
+signal event(message : String)
 
 func _ready() -> void:
 	FileLoader.load_file(LINCOLN)
+	event.emit("Loaded File")
+	await gen_step()
+	generate_spawn()
+	await gen_step()
+	event.emit("Found Spawn Point")
 	generate_terrain()
+	await gen_step()
 	generate_buildings()
+	event.emit("Loaded Buildings")
+	await gen_step()
 	generate_paths()
+	await gen_step()
 	generate_bridges()
-	global_position = Vector3(-FileLoader.bbox[2], -5,  -FileLoader.bbox[3])
+	event.emit("Loaded Bridges")
+	await gen_step()
+	WorldOrigin.global_position = Vector3(-FileLoader.bbox[2], -5,  -FileLoader.bbox[3])
+	WorldOrigin.name = FileLoader.worldName
 	file_loaded.emit()
+	event.emit("Done")
+	
+	assign_ownership_recursive(WorldOrigin, WorldOrigin)
+	
+	var scene = PackedScene.new()
+	scene.pack(WorldOrigin)
+	event.emit("Saving at res://SavedGens/" + FileLoader.worldName + ".tscn")
+	var result = ResourceSaver.save(scene, "res://SavedGens/" + FileLoader.worldName + ".tscn")
+	event.emit("Save result: " + str(result))
+
+func assign_ownership_recursive(root: Node, owner: Node):
+	for child in root.get_children():
+		child.set_owner(owner)
+		assign_ownership_recursive(child, owner)
+
+func generate_spawn():
+	for point in FileLoader.loaded_points:
+		if point.properties.name == "SPAWN_POINT":
+			WorldOrigin.spawn_point = Node3D.new()
+			WorldOrigin.spawn_point.name = "SPAWN POINT"
+			WorldOrigin.spawn_point.position = Vector3(point.geometry.coordinates.x, point.geometry.coordinates.y, -6)
+			WorldOrigin.add_child(WorldOrigin.spawn_point)
+			return
+	
+	event.emit("Could not find spawn point feature. Terminating...")
+	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
 
 func generate_paths():
 	var path_total = CSGCombiner3D.new()
@@ -32,7 +74,7 @@ func generate_paths():
 				path.polygon = poly
 				path.depth = 5.01
 				path.material = GRAVEL
-				path.use_collision = true
+				path.operation = CSGPolygon3D.OPERATION_UNION
 				path_total.add_child(path)
 				
 	for linestring in FileLoader.loaded_lines:
@@ -43,7 +85,7 @@ func generate_paths():
 				path.polygon = discrete_poly
 				path.depth = 5.01
 				path.material = GRAVEL
-				path.use_collision = true
+				path.operation = CSGPolygon3D.OPERATION_UNION
 				path_total.add_child(path)
 			continue
 		if ["primary", "secondary", "tertiary", "unclassified", "service", "residential", "unclassified", "trunk"].has(linestring.properties.highway) and linestring.properties.bridge != "yes":
@@ -53,7 +95,7 @@ func generate_paths():
 				path.polygon = discrete_poly
 				path.depth = 5.02
 				path.material = ROAD
-				path.use_collision = true
+				path.operation = CSGPolygon3D.OPERATION_UNION
 				road_total.add_child(path)
 			continue
 		if linestring.properties.railway != "-1" and linestring.properties.ref != "NOB4" and "Line" in linestring.properties.name:
@@ -63,13 +105,19 @@ func generate_paths():
 				path.polygon = discrete_poly
 				path.depth = 5.03
 				path.material = RAIL
-				path.use_collision = true
+				path.operation = CSGPolygon3D.OPERATION_UNION
 				rail_total.add_child(path)
 			continue
 		
-	add_child(path_total)
-	add_child(road_total)
-	add_child(rail_total)
+	WorldOrigin.add_child(path_total)
+	path_total.use_collision = true
+	event.emit("Loaded Paths")
+	WorldOrigin.add_child(road_total)
+	road_total.use_collision = true
+	event.emit("Loaded Roads")
+	WorldOrigin.add_child(rail_total)
+	rail_total.use_collision = true
+	event.emit("Loaded Rails")
 
 func generate_bridges():
 	var bridges = Node3D.new()
@@ -184,7 +232,7 @@ func generate_bridges():
 	
 	bridges.rotation_degrees = Vector3(-90, 0, 0)
 	bridges.position.z = -5
-	add_child(bridges)
+	WorldOrigin.add_child(bridges)
 
 func generate_buildings():
 	var building_container = Node3D.new()
@@ -194,15 +242,15 @@ func generate_buildings():
 			for poly in building.geometry.coordinates:
 				var building_csg = CSGPolygon3D.new()
 				building_csg.polygon = poly
+				building_csg.operation = CSGPolygon3D.OPERATION_UNION
 				building_csg.depth = pow(polygon_area(poly), 0.22) * 3
-				building_csg.operation = CSGPolygon3D.OPERATION_SUBTRACTION
 				building_csg.material = BUILDING
-				building.use_collision = true
+				building_csg.use_collision = true
 				building_container.add_child(building_csg)
 	
 	building_container.global_position.z = -5
 	building_container.name = "BUILDINGS"
-	add_child(building_container)
+	WorldOrigin.add_child(building_container)
 
 
 func polygon_area(points: PackedVector2Array) -> float:
@@ -224,6 +272,7 @@ func generate_terrain():
 		Vector2(FileLoader.bbox[2], FileLoader.bbox[3]),
 		Vector2(FileLoader.bbox[2], FileLoader.bbox[1])
 	])
+	event.emit("Created Terrain")
 	
 	grass.depth = 5
 
@@ -250,6 +299,7 @@ func generate_terrain():
 				water.depth = 5
 				water.operation = CSGPolygon3D.OPERATION_UNION
 				water_total.add_child(water)
+	event.emit("Created Lakes and Rivers")
 	
 	base_terrain.add_child(grass)
 	water_total.operation = CSGShape3D.OPERATION_SUBTRACTION
@@ -259,4 +309,7 @@ func generate_terrain():
 	
 	base_terrain.material_override = GRASS
 	base_terrain.name = "TERRAIN"
-	add_child(base_terrain)
+	WorldOrigin.add_child(base_terrain)
+
+func gen_step():
+	await get_tree().process_frame

@@ -1,0 +1,61 @@
+[gd_scene load_steps=5 format=3 uid="uid://citpyjnjhqwd0"]
+
+[ext_resource type="Texture2D" uid="uid://bounmhwd6s4j7" path="res://Sprites/ATS.webp" id="1_tt5f1"]
+[ext_resource type="Script" uid="uid://boq4a600x8t4j" path="res://Scripts/MainMenu/StartScreen/Play.gd" id="2_853f1"]
+[ext_resource type="Script" uid="uid://ckxbg2mub1djk" path="res://Scripts/MainMenu/StartScreen/Quit.gd" id="3_ghw46"]
+[ext_resource type="Script" uid="uid://qo1obp4hwjlk" path="res://Scripts/MainMenu/StartScreen/Generator.gd" id="4_df05h"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainMenuSlide" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 640.0
+offset_bottom = 360.0
+scale = Vector2(1.00487, 1.00487)
+
+[node name="Start" type="Control" parent="MainMenuSlide"]
+anchors_preset = 0
+offset_right = 643.0
+offset_bottom = 362.0
+
+[node name="Ats" type="Sprite2D" parent="MainMenuSlide/Start"]
+texture_filter = 1
+position = Vector2(346.501, 131.5)
+scale = Vector2(2.45313, 2.45313)
+texture = ExtResource("1_tt5f1")
+
+[node name="PLAY" type="Button" parent="MainMenuSlide/Start"]
+layout_mode = 0
+offset_left = 278.501
+offset_top = 191.5
+offset_right = 391.501
+offset_bottom = 222.5
+text = "PLAY"
+script = ExtResource("2_853f1")
+
+[node name="QUIT" type="Button" parent="MainMenuSlide/Start"]
+layout_mode = 0
+offset_left = 278.501
+offset_top = 233.5
+offset_right = 391.501
+offset_bottom = 264.5
+text = "QUIT"
+script = ExtResource("3_ghw46")
+
+[node name="GENERATOR" type="Button" parent="MainMenuSlide/Start"]
+layout_mode = 0
+offset_left = 278.501
+offset_top = 274.5
+offset_right = 391.501
+offset_bottom = 305.5
+text = "GENERATOR"
+script = ExtResource("4_df05h")
+
+[connection signal="pressed" from="MainMenuSlide/Start/PLAY" to="MainMenuSlide/Start/PLAY" method="_on_pressed"]
+[connection signal="pressed" from="MainMenuSlide/Start/GENERATOR" to="MainMenuSlide/Start/GENERATOR" method="_on_pressed"]

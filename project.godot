@@ -11,14 +11,18 @@ config_version=5
 [application]
 
 config/name="arcademia-taxi-simulator"
-run/main_scene="uid://tpxs6qmxvhq1"
+run/main_scene="uid://citpyjnjhqwd0"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
+run/size/mode=3
+run/size/viewport_height=1080
+run/size/viewport_width=1920
 
 [display]
 
-window/size/viewport_width=480
+window/size/viewport_width=640
 window/size/viewport_height=360
+window/size/mode=3
 window/stretch/mode="viewport"
 
 [input]

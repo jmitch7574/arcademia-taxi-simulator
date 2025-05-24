@@ -1,0 +1,43 @@
+[gd_scene load_steps=7 format=3 uid="uid://c2qe472gc2y8l"]
+
+[ext_resource type="Script" uid="uid://egetfhucuy3b" path="res://Scripts/GameLoader.gd" id="1_2a8lj"]
+[ext_resource type="Material" uid="uid://8uprxpao80pn" path="res://Material/water.tres" id="3_t5yij"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_3ql1u"]
+
+[sub_resource type="Sky" id="Sky_btdjb"]
+sky_material = SubResource("ProceduralSkyMaterial_3ql1u")
+
+[sub_resource type="Environment" id="Environment_3ql1u"]
+background_mode = 2
+sky = SubResource("Sky_btdjb")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_duywi"]
+material = ExtResource("3_t5yij")
+size = Vector2(100000, 100000)
+subdivide_width = 1024
+subdivide_depth = 1024
+
+[node name="GameRoot" type="Node3D"]
+script = ExtResource("1_2a8lj")
+
+[node name="Node3D" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 1.06581e-14, 0, -1.06581e-14, 1, -12521.4, -5, -102824)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_3ql1u")
+
+[node name="Water" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25000, -3, -25000)
+mesh = SubResource("PlaneMesh_duywi")
+skeleton = NodePath("")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 52.0034, 0)
+shadow_enabled = true
+directional_shadow_mode = 0
+directional_shadow_split_1 = 0.665
+directional_shadow_split_2 = 0.79
+directional_shadow_split_3 = 1.0
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 1000.0
