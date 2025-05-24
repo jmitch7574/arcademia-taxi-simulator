@@ -32,6 +32,7 @@ func generate_paths():
 				path.polygon = poly
 				path.depth = 5.01
 				path.material = GRAVEL
+				path.use_collision = true
 				path_total.add_child(path)
 				
 	for linestring in FileLoader.loaded_lines:
@@ -42,6 +43,7 @@ func generate_paths():
 				path.polygon = discrete_poly
 				path.depth = 5.01
 				path.material = GRAVEL
+				path.use_collision = true
 				path_total.add_child(path)
 			continue
 		if ["primary", "secondary", "tertiary", "unclassified", "service", "residential", "unclassified", "trunk"].has(linestring.properties.highway) and linestring.properties.bridge != "yes":
@@ -51,6 +53,7 @@ func generate_paths():
 				path.polygon = discrete_poly
 				path.depth = 5.02
 				path.material = ROAD
+				path.use_collision = true
 				road_total.add_child(path)
 			continue
 		if linestring.properties.railway != "-1" and linestring.properties.ref != "NOB4" and "Line" in linestring.properties.name:
@@ -60,6 +63,7 @@ func generate_paths():
 				path.polygon = discrete_poly
 				path.depth = 5.03
 				path.material = RAIL
+				path.use_collision = true
 				rail_total.add_child(path)
 			continue
 		
@@ -175,6 +179,7 @@ func generate_bridges():
 			var mesh_instance := MeshInstance3D.new()
 			mesh_instance.mesh = mesh
 			mesh_instance.position = center
+			mesh_instance.create_trimesh_collision()
 			bridges.add_child(mesh_instance)
 	
 	bridges.rotation_degrees = Vector3(-90, 0, 0)
@@ -192,6 +197,7 @@ func generate_buildings():
 				building_csg.depth = pow(polygon_area(poly), 0.22) * 3
 				building_csg.operation = CSGPolygon3D.OPERATION_SUBTRACTION
 				building_csg.material = BUILDING
+				building.use_collision = true
 				building_container.add_child(building_csg)
 	
 	building_container.global_position.z = -5
@@ -248,6 +254,7 @@ func generate_terrain():
 	base_terrain.add_child(grass)
 	water_total.operation = CSGShape3D.OPERATION_SUBTRACTION
 	base_terrain.add_child(water_total)
+	base_terrain.use_collision = true
 	
 	
 	base_terrain.material_override = GRASS
