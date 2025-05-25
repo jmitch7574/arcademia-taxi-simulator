@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://c2qe472gc2y8l"]
+[gd_scene load_steps=8 format=3 uid="uid://c2qe472gc2y8l"]
 
 [ext_resource type="Script" uid="uid://egetfhucuy3b" path="res://Scripts/GameLoader.gd" id="1_2a8lj"]
+[ext_resource type="PackedScene" uid="uid://lvwwb7r05irj" path="res://Scenes/Generator.tscn" id="1_snns1"]
 [ext_resource type="Material" uid="uid://8uprxpao80pn" path="res://Material/water.tres" id="3_t5yij"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_3ql1u"]
@@ -24,6 +25,8 @@ script = ExtResource("1_2a8lj")
 [node name="Node3D" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 1.06581e-14, 0, -1.06581e-14, 1, -12521.4, -5, -102824)
 
+[node name="Generator" parent="." instance=ExtResource("1_snns1")]
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_3ql1u")
 
@@ -41,3 +44,7 @@ directional_shadow_split_2 = 0.79
 directional_shadow_split_3 = 1.0
 directional_shadow_blend_splits = true
 directional_shadow_max_distance = 1000.0
+
+[connection signal="file_loaded" from="Generator" to="." method="_on_generator_file_loaded"]
+
+[editable path="Generator"]

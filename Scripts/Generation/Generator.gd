@@ -15,36 +15,57 @@ var step := 0
 signal file_loaded
 signal event(message : String)
 
+var building_thread : Thread
+var terrain_thread : Thread
+var path_thread : Thread
+var bridges_thread : Thread
+
+var base_terrain : CSGCombiner3D
+var path_total : CSGCombiner3D
+var road_total : CSGCombiner3D
+var rail_total : CSGCombiner3D
+var building_container : Node3D
+var bridges : Node3D
+
+var t0 : float
+
+var finished = false
+var threads : Array[bool] = []
+
+const ROAD_MATCH = ["primary", "secondary", "tertiary", "unclassified", "service", "residential", "unclassified", "trunk"]
+const PATH_MATCH = ["pedestrian", "steps", "footway"]
+
 func _ready() -> void:
+	await get_tree().process_frame
 	FileLoader.load_file(LINCOLN)
 	event.emit("Loaded File")
-	await gen_step()
+	t0 = Time.get_ticks_msec()
+	
+	building_thread = Thread.new()
+	terrain_thread = Thread.new()
+	path_thread = Thread.new()
+	bridges_thread = Thread.new()
+	
 	generate_spawn()
-	await gen_step()
-	event.emit("Found Spawn Point")
-	generate_terrain()
-	await gen_step()
-	generate_buildings()
-	event.emit("Loaded Buildings")
-	await gen_step()
-	generate_paths()
-	await gen_step()
-	generate_bridges()
-	event.emit("Loaded Bridges")
-	await gen_step()
+	
+	building_thread.start(generate_buildings, Thread.PRIORITY_HIGH)
+	terrain_thread.start(generate_terrain, Thread.PRIORITY_HIGH)
+	path_thread.start(generate_paths, Thread.PRIORITY_HIGH)
+	bridges_thread.start(generate_bridges, Thread.PRIORITY_HIGH)
+	
+	threads = [false, false, false, false]
+	
 	WorldOrigin.global_position = Vector3(-FileLoader.bbox[2], -5,  -FileLoader.bbox[3])
-	WorldOrigin.name = FileLoader.worldName
+
+func _process(delta: float):
+	if finished:
+		return
+	for i in threads:
+		if not i:
+			return
+	
+	finished = true
 	file_loaded.emit()
-	event.emit("Done")
-	
-	bake_csgs_recursive(WorldOrigin)
-	assign_ownership_recursive(WorldOrigin, WorldOrigin)
-	
-	var scene = PackedScene.new()
-	scene.pack(WorldOrigin)
-	event.emit("Saving at res://SavedGens/" + FileLoader.worldName + ".tscn")
-	var result = ResourceSaver.save(scene, "res://SavedGens/" + FileLoader.worldName + ".tscn")
-	event.emit("Save result: " + str(result))
 
 func assign_ownership_recursive(root: Node, owner: Node):
 	for child in root.get_children():
@@ -64,37 +85,37 @@ func generate_spawn():
 	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
 
 func generate_paths():
-	var path_total = CSGCombiner3D.new()
-	var road_total = CSGCombiner3D.new()
-	var rail_total = CSGCombiner3D.new()
+	path_total = CSGCombiner3D.new()
+	road_total = CSGCombiner3D.new()
+	rail_total = CSGCombiner3D.new()
 	
-	for multipoly in FileLoader.loaded_multipolys:
-		if ["pedestrian", "steps", "footway"].has(multipoly.properties.highway):
-			for poly in multipoly.geometry.coordinates:
-				var path = CSGPolygon3D.new()
-				path.polygon = poly
-				path.depth = 5.01
-				path.material = GRAVEL
-				path.operation = CSGPolygon3D.OPERATION_UNION
-				path_total.add_child(path)
+	#for multipoly : GeoJsonMultiPolyogn in FileLoader.loaded_multipolys:
+#		if PATH_MATCH.has(multipoly.properties.highway):
+#			for poly in multipoly.geometry.coordinates:
+#				var path = CSGPolygon3D.new()
+#				path.polygon = poly
+#				path.depth = 5.01
+#				path.material = GRAVEL
+#				path.operation = CSGPolygon3D.OPERATION_UNION
+#				path_total.add_child(path)
 				
-	for linestring in FileLoader.loaded_lines:
-		if ["pedestrian", "steps", "footway"].has(linestring.properties.highway) and linestring.properties.bridge != "yes":
+	for linestring : GeoJsonLineString in FileLoader.loaded_lines:
+		if PATH_MATCH.has(linestring.properties.highway) and linestring.properties.bridge != "yes":
 			var poly = linestring.geometry.as_polygon(2)
 			for discrete_poly in poly:
 				var path = CSGPolygon3D.new()
 				path.polygon = discrete_poly
-				path.depth = 5.05
+				path.depth = 5.01
 				path.material = GRAVEL
 				path.operation = CSGPolygon3D.OPERATION_UNION
 				path_total.add_child(path)
 			continue
-		if ["primary", "secondary", "tertiary", "unclassified", "service", "residential", "unclassified", "trunk"].has(linestring.properties.highway) and linestring.properties.bridge != "yes":
+		if ROAD_MATCH.has(linestring.properties.highway) and linestring.properties.bridge != "yes":
 			var poly = linestring.geometry.as_polygon(2.5 * min(linestring.properties.lanes, 2))
 			for discrete_poly in poly:
 				var path = CSGPolygon3D.new()
 				path.polygon = discrete_poly
-				path.depth = 5.1
+				path.depth = 5.02
 				path.material = ROAD
 				path.operation = CSGPolygon3D.OPERATION_UNION
 				road_total.add_child(path)
@@ -110,18 +131,22 @@ func generate_paths():
 				rail_total.add_child(path)
 			continue
 		
-	WorldOrigin.add_child(path_total)
 	path_total.use_collision = true
-	event.emit("Loaded Paths")
-	WorldOrigin.add_child(road_total)
 	road_total.use_collision = true
-	event.emit("Loaded Roads")
-	WorldOrigin.add_child(rail_total)
 	rail_total.use_collision = true
-	event.emit("Loaded Rails")
+	call_deferred("paths_callback")
+
+func paths_callback():
+	path_thread.wait_to_finish()
+	threads[0] = true
+	WorldOrigin.add_child(path_total)
+	WorldOrigin.add_child(road_total)
+	WorldOrigin.add_child(rail_total)
+	print("Paths: " + str(Time.get_ticks_msec() - t0))
+	
 
 func generate_bridges():
-	var bridges = Node3D.new()
+	bridges = Node3D.new()
 	for linestring in FileLoader.loaded_lines:
 		if linestring.properties.bridge == "yes" and ["primary", "secondary", "tertiary", "unclassified", "service", "residential", "unclassified", "trunk"].has(linestring.properties.highway):
 			var path = Path3D.new()
@@ -233,26 +258,37 @@ func generate_bridges():
 	
 	bridges.rotation_degrees = Vector3(-90, 0, 0)
 	bridges.position.z = -5
+	call_deferred("bridges_callback")
+
+
+func bridges_callback():
+	bridges_thread.wait_to_finish()
+	threads[1] = true
 	WorldOrigin.add_child(bridges)
+	print("Bridges: " + str(Time.get_ticks_msec() - t0))
 
 func generate_buildings():
-	var building_container = Node3D.new()
+	building_container = Node3D.new()
 	
 	for building in FileLoader.loaded_multipolys:
 		if building.properties.building != "-1" or building.properties.building != "-1":
-			for poly in building.geometry.coordinates:
-				var building_csg = CSGPolygon3D.new()
-				building_csg.polygon = poly
-				building_csg.operation = CSGPolygon3D.OPERATION_UNION
-				building_csg.depth = pow(polygon_area(poly), 0.22) * 3
-				building_csg.material = BUILDING
-				building_csg.use_collision = true
-				building_container.add_child(building_csg)
+			var building_csg = CSGPolygon3D.new()
+			building_csg.polygon = building.geometry.coordinates[0]
+			building_csg.operation = CSGPolygon3D.OPERATION_UNION
+			building_csg.depth = pow(polygon_area(building.geometry.coordinates[0]), 0.22) * 3
+			building_csg.material = BUILDING
+			building_csg.use_collision = true
+			building_container.add_child(building_csg)
 	
-	building_container.global_position.z = -5
 	building_container.name = "BUILDINGS"
-	WorldOrigin.add_child(building_container)
+	
+	call_deferred("building_callback")
 
+func building_callback():
+	building_thread.wait_to_finish()
+	threads[2] = true
+	WorldOrigin.add_child(building_container)
+	print("Buildings: " + str(Time.get_ticks_msec() - t0))
 
 func polygon_area(points: PackedVector2Array) -> float:
 	var area := 0.0
@@ -263,7 +299,7 @@ func polygon_area(points: PackedVector2Array) -> float:
 	return abs(area) * 0.5
 
 func generate_terrain():
-	var base_terrain = CSGCombiner3D.new()
+	base_terrain = CSGCombiner3D.new()
 	var water_total = CSGCombiner3D.new()
 	
 	var grass = CSGPolygon3D.new()
@@ -273,28 +309,24 @@ func generate_terrain():
 		Vector2(FileLoader.bbox[2], FileLoader.bbox[3]),
 		Vector2(FileLoader.bbox[2], FileLoader.bbox[1])
 	])
-	event.emit("Created Terrain")
 	
 	grass.depth = 5
 	grass.material = GRASS
 
-	
 	for feature in FileLoader.loaded_multipolys:
 		if feature.properties.water != "-1" or feature.properties.waterway != "-1":
-			for poly in feature.geometry.coordinates:
-				var water = CSGPolygon3D.new()
-				water.polygon = poly
-				water.depth = 5
-				water.operation = CSGPolygon3D.OPERATION_UNION
-				water_total.add_child(water)
+			var water = CSGPolygon3D.new()
+			water.polygon = feature.geometry.coordinates[0]
+			water.depth = 5
+			water.operation = CSGPolygon3D.OPERATION_UNION
+			water_total.add_child(water)
 		if feature.properties.landuse == "resedential":
-			for poly in feature.geometry.coordinates:
-				var resedential = CSGPolygon3D.new()
-				resedential.polygon = poly
-				resedential.depth = 5.01
-				resedential.operation = CSGPolygon3D.OPERATION_UNION
-				resedential.material = GRAVEL
-				base_terrain.add_child(resedential)
+			var resedential = CSGPolygon3D.new()
+			resedential.polygon = feature.geometry.coordinates[0]
+			resedential.depth = 5.01
+			resedential.operation = CSGPolygon3D.OPERATION_UNION
+			resedential.material = GRAVEL
+			base_terrain.add_child(resedential)
 				
 	for feature in FileLoader.loaded_lines:
 		if "Brayford" in feature.properties.name:
@@ -307,7 +339,6 @@ func generate_terrain():
 				water.depth = 5
 				water.operation = CSGPolygon3D.OPERATION_UNION
 				water_total.add_child(water)
-	event.emit("Created Lakes and Rivers")
 	
 	base_terrain.add_child(grass)
 	water_total.operation = CSGShape3D.OPERATION_SUBTRACTION
@@ -316,7 +347,13 @@ func generate_terrain():
 	
 	
 	base_terrain.name = "TERRAIN"
+	call_deferred("terrain_callback")
+
+func terrain_callback():
+	terrain_thread.wait_to_finish()
+	threads[3] = true
 	WorldOrigin.add_child(base_terrain)
+	print("Terrain: " + str(Time.get_ticks_msec() - t0))
 
 func gen_step():
 	await get_tree().process_frame
@@ -350,3 +387,6 @@ func bake_csgs_recursive(root: Node):
 			bake_csg_to_static(child)
 		else:
 			bake_csgs_recursive(child)
+
+func emit_message(message : String):
+	event.emit(message)
