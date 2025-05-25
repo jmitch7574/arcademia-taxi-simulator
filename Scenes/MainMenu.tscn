@@ -16,14 +16,14 @@ grow_vertical = 2
 
 [node name="MainMenuSlide" type="Control" parent="."]
 anchors_preset = 0
-offset_right = 640.0
-offset_bottom = 360.0
-scale = Vector2(0.60487, 0.60487)
+offset_right = 663.0
+offset_bottom = 375.0
+scale = Vector2(2.88487, 2.88487)
 
 [node name="Start" type="Control" parent="MainMenuSlide"]
 anchors_preset = 0
-offset_right = 643.0
-offset_bottom = 362.0
+offset_right = 3178.0
+offset_bottom = 1784.0
 
 [node name="Ats" type="Sprite2D" parent="MainMenuSlide/Start"]
 texture_filter = 1

@@ -1,8 +1,12 @@
-[gd_scene load_steps=8 format=3 uid="uid://c2qe472gc2y8l"]
+[gd_scene load_steps=12 format=3 uid="uid://c2qe472gc2y8l"]
 
 [ext_resource type="Script" uid="uid://egetfhucuy3b" path="res://Scripts/GameLoader.gd" id="1_2a8lj"]
 [ext_resource type="PackedScene" uid="uid://lvwwb7r05irj" path="res://Scenes/Generator.tscn" id="1_snns1"]
 [ext_resource type="Material" uid="uid://8uprxpao80pn" path="res://Material/water.tres" id="3_t5yij"]
+[ext_resource type="Script" uid="uid://c5hdigbxnwynf" path="res://Scripts/UIManage.gd" id="4_gd21k"]
+[ext_resource type="FontFile" uid="uid://delhvnwvr5rin" path="res://Fonts/E1234.ttf" id="4_wvpkb"]
+[ext_resource type="FontFile" uid="uid://mvjksgkkatqw" path="res://Fonts/joystix monospace.otf" id="5_t5yij"]
+[ext_resource type="Texture2D" uid="uid://b1ss45g256c4j" path="res://Sprites/arrow.png" id="6_qo00e"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_3ql1u"]
 
@@ -45,6 +49,124 @@ directional_shadow_split_3 = 1.0
 directional_shadow_blend_splits = true
 directional_shadow_max_distance = 1000.0
 
+[node name="GameUI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1922.0
+offset_bottom = 1081.0
+script = ExtResource("4_gd21k")
+
+[node name="Time and Score" type="Control" parent="GameUI"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ColorRect2" type="ColorRect" parent="GameUI/Time and Score"]
+layout_mode = 0
+offset_right = 432.0
+offset_bottom = 213.0
+color = Color(0, 0, 0, 1)
+
+[node name="ColorRect3" type="ColorRect" parent="GameUI/Time and Score"]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = 409.0
+offset_bottom = 123.0
+
+[node name="ColorRect" type="ColorRect" parent="GameUI/Time and Score"]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 143.0
+offset_right = 363.0
+offset_bottom = 191.0
+color = Color(0.146534, 0.0681393, 0.0503347, 1)
+
+[node name="Time" type="Label" parent="GameUI/Time and Score"]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = 407.0
+offset_bottom = 123.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_wvpkb")
+theme_override_font_sizes/font_size = 72
+text = "03:00"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Money" type="Label" parent="GameUI/Time and Score"]
+layout_mode = 0
+offset_left = 55.0
+offset_top = 149.0
+offset_right = 361.0
+offset_bottom = 188.0
+theme_override_colors/font_color = Color(0.853914, 0.570865, 0.128479, 1)
+theme_override_fonts/font = ExtResource("5_t5yij")
+theme_override_font_sizes/font_size = 32
+text = "$15"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Current Destination" type="Control" parent="GameUI"]
+anchors_preset = 0
+offset_left = 1313.0
+offset_right = 1919.0
+offset_bottom = 156.0
+
+[node name="ColorRect4" type="ColorRect" parent="GameUI/Current Destination"]
+layout_mode = 0
+offset_left = -2.0
+offset_top = -1.0
+offset_right = 608.0
+offset_bottom = 207.0
+color = Color(0, 0, 0, 1)
+
+[node name="CurrentFare" type="Label" parent="GameUI/Current Destination"]
+layout_mode = 0
+offset_left = 360.0
+offset_top = 97.0
+offset_right = 598.0
+offset_bottom = 136.0
+theme_override_colors/font_color = Color(0.853914, 0.570865, 0.128479, 1)
+theme_override_fonts/font = ExtResource("5_t5yij")
+theme_override_font_sizes/font_size = 24
+text = "Fare: $15"
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Distance" type="Label" parent="GameUI/Current Destination"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 96.0
+offset_right = 250.0
+offset_bottom = 135.0
+theme_override_fonts/font = ExtResource("5_t5yij")
+theme_override_font_sizes/font_size = 24
+text = "Dist: 15m"
+vertical_alignment = 2
+
+[node name="BuildName" type="Label" parent="GameUI/Current Destination"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 600.0
+offset_bottom = 97.0
+theme_override_fonts/font = ExtResource("5_t5yij")
+theme_override_font_sizes/font_size = 24
+text = "Isaac newton building"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ArrowContainer" type="Node2D" parent="GameUI/Current Destination"]
+position = Vector2(306, 145)
+
+[node name="Arrow" type="Sprite2D" parent="GameUI/Current Destination/ArrowContainer"]
+position = Vector2(-3, -3)
+texture = ExtResource("6_qo00e")
+
+[connection signal="fare_complete" from="." to="GameUI" method="_on_game_root_fare_complete"]
+[connection signal="fare_started" from="." to="GameUI" method="_on_game_root_fare_started"]
 [connection signal="file_loaded" from="Generator" to="." method="_on_generator_file_loaded"]
 [connection signal="file_loaded" from="Generator" to="Generator/UI/Notices" method="_on_generator_file_loaded"]
 

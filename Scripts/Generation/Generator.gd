@@ -1,3 +1,4 @@
+class_name Generator
 extends Node3D
 
 const LINCOLN = "res://GeoJson-Files/lincoln.geojson"
@@ -7,7 +8,6 @@ const PAVED_BRICK = preload("res://Material/paved_brick.tres")
 const GRAVEL = preload("res://Material/gravel.tres")
 const ROAD = preload("res://Material/road.tres")
 const RAIL = preload("res://Material/rail.tres")
-@onready var debug_camera: Camera3D = $"../DebugCamera"
 
 @onready var anchor: Node3D = $Anchor
 @onready var WorldOrigin: StoredWorldInfo = $WorldOrigin
@@ -31,6 +31,8 @@ var paths : Array[PackedVector2Array] = [] as Array[PackedVector2Array]
 var roads : Array[PackedVector2Array] = [] as Array[PackedVector2Array]
 var rails : Array[PackedVector2Array] = [] as Array[PackedVector2Array]
 var builds : Array[PackedVector2Array] = [] as Array[PackedVector2Array]
+var build_names : Array[String] = []
+var selectable_buildings : Array[NamedBuilding] = []
 var waters : Array[PackedVector2Array] = [] as Array[PackedVector2Array]
 var bridges : Array[Path3D]
 
@@ -288,6 +290,7 @@ func generate_buildings():
 	for building in FileLoader.loaded_multipolys:
 		if building.properties.building != "-1" or building.properties.building != "-1":
 			builds.append(building.geometry.coordinates[0])
+			build_names.append(building.properties.name)
 	
 	building_container.name = "BUILDINGS"
 	
@@ -297,14 +300,18 @@ func building_callback():
 	building_thread.wait_to_finish()
 	WorldOrigin.add_child(building_container)
 	
-	for build in builds:
-			var building_csg = CSGPolygon3D.new()
-			building_csg.polygon = build
-			building_csg.operation = CSGPolygon3D.OPERATION_UNION
-			building_csg.depth = pow(polygon_area(build), 0.22) * 3
-			building_csg.material = BUILDING
-			building_csg.use_collision = true
-			building_container.add_child(building_csg)
+	for i in range(len(builds)):
+		var build = builds[i]
+		var building_csg = NamedBuilding.new()
+		building_csg.polygon = build
+		building_csg.operation = CSGPolygon3D.OPERATION_UNION
+		building_csg.depth = pow(polygon_area(build), 0.22) * 3
+		building_csg.material = BUILDING
+		building_csg.use_collision = true
+		building_csg.building_name = build_names[i]
+		if build_names[i] != "-1":
+			selectable_buildings.append(building_csg)
+		building_container.add_child(building_csg)
 			
 	threads[2] = true
 	print("Buildings: " + str(Time.get_ticks_msec() - t0))
