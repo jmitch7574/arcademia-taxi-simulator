@@ -21,11 +21,17 @@ var path_thread : Thread
 var bridges_thread : Thread
 
 var base_terrain : CSGCombiner3D
+var water_total : CSGCombiner3D
 var path_total : CSGCombiner3D
-var road_total : CSGCombiner3D
-var rail_total : CSGCombiner3D
 var building_container : Node3D
-var bridges : Node3D
+var bridges_container : Node3D
+
+var paths : Array[PackedVector2Array]
+var roads : Array[PackedVector2Array]
+var rails : Array[PackedVector2Array]
+var builds : Array[PackedVector2Array]
+var waters : Array[PackedVector2Array]
+var bridges : Array[Path3D]
 
 var t0 : float
 
@@ -45,6 +51,7 @@ func _ready() -> void:
 	terrain_thread = Thread.new()
 	path_thread = Thread.new()
 	bridges_thread = Thread.new()
+	
 	
 	generate_spawn()
 	
@@ -86,8 +93,6 @@ func generate_spawn():
 
 func generate_paths():
 	path_total = CSGCombiner3D.new()
-	road_total = CSGCombiner3D.new()
-	rail_total = CSGCombiner3D.new()
 	
 	#for multipoly : GeoJsonMultiPolyogn in FileLoader.loaded_multipolys:
 #		if PATH_MATCH.has(multipoly.properties.highway):
@@ -103,50 +108,57 @@ func generate_paths():
 		if PATH_MATCH.has(linestring.properties.highway) and linestring.properties.bridge != "yes":
 			var poly = linestring.geometry.as_polygon(2)
 			for discrete_poly in poly:
-				var path = CSGPolygon3D.new()
-				path.polygon = discrete_poly
-				path.depth = 5.01
-				path.material = GRAVEL
-				path.operation = CSGPolygon3D.OPERATION_UNION
-				path_total.add_child(path)
+				paths.append(discrete_poly)
 			continue
 		if ROAD_MATCH.has(linestring.properties.highway) and linestring.properties.bridge != "yes":
 			var poly = linestring.geometry.as_polygon(2.5 * min(linestring.properties.lanes, 2))
 			for discrete_poly in poly:
-				var path = CSGPolygon3D.new()
-				path.polygon = discrete_poly
-				path.depth = 5.02
-				path.material = ROAD
-				path.operation = CSGPolygon3D.OPERATION_UNION
-				road_total.add_child(path)
+				roads.append(discrete_poly)
 			continue
 		if linestring.properties.railway != "-1" and linestring.properties.ref != "NOB4" and "Line" in linestring.properties.name:
 			var poly = linestring.geometry.as_polygon(3)
 			for discrete_poly in poly:
-				var path = CSGPolygon3D.new()
-				path.polygon = discrete_poly
-				path.depth = 5.03
-				path.material = RAIL
-				path.operation = CSGPolygon3D.OPERATION_UNION
-				rail_total.add_child(path)
+				rails.append(discrete_poly)
 			continue
 		
 	path_total.use_collision = true
-	road_total.use_collision = true
-	rail_total.use_collision = true
 	call_deferred("paths_callback")
 
 func paths_callback():
 	path_thread.wait_to_finish()
+	print("Paths: " + str(Time.get_ticks_msec() - t0))
 	threads[0] = true
+	path_total = CSGCombiner3D.new()
+	
+	for path in paths:
+		var csg = CSGPolygon3D.new()
+		csg.polygon = path
+		csg.depth = 5.01
+		csg.material = GRAVEL
+		csg.operation = CSGPolygon3D.OPERATION_UNION
+		path_total.add_child(csg)
+	for road in roads:
+		var csg = CSGPolygon3D.new()
+		csg.polygon = road
+		csg.depth = 5.02
+		csg.material = ROAD
+		csg.operation = CSGPolygon3D.OPERATION_UNION
+		path_total.add_child(csg)
+	for rail in rails:
+		var csg = CSGPolygon3D.new()
+		csg.polygon = rail
+		csg.depth = 5.03
+		csg.material = RAIL
+		csg.operation = CSGPolygon3D.OPERATION_UNION
+		path_total.add_child(csg)
+		
 	WorldOrigin.add_child(path_total)
-	WorldOrigin.add_child(road_total)
-	WorldOrigin.add_child(rail_total)
+	
 	print("Paths: " + str(Time.get_ticks_msec() - t0))
 	
 
 func generate_bridges():
-	bridges = Node3D.new()
+	bridges_container = Node3D.new()
 	for linestring in FileLoader.loaded_lines:
 		if linestring.properties.bridge == "yes" and ["primary", "secondary", "tertiary", "unclassified", "service", "residential", "unclassified", "trunk"].has(linestring.properties.highway):
 			var path = Path3D.new()
@@ -160,111 +172,114 @@ func generate_bridges():
 				var t = float(k) / float(coords.size() - 1)
 				var bridge_height = sin(t * PI) * min(len(coords), 15)
 				path.curve.add_point(Vector3(coords[k].x, bridge_height, coords[k].y))
-		
 			
-			var curve : Curve3D = path.curve
-			var st := SurfaceTool.new()
-			st.begin(Mesh.PRIMITIVE_TRIANGLES)
-
-			var points := []
-			var d := 0.0
-			while d < curve.get_baked_length():
-				points.append(curve.sample_baked(d))
-				d += 2
-
-			# Compute center offset
-			var center := Vector3.ZERO
-			for p in points:
-				center += p
-			center /= points.size()
-
-			var width = 6.0
-			var height = 3
-
-			for i in range(points.size() - 1):
-				var p1 = points[i] - center
-				var p2 = points[i + 1] - center
-
-				p1 = p1 + (p1 - p2) * 0.1
-				p2 = p2 + (p2 - p1) * 0.1
-
-				var forward = (p2 - p1).normalized()
-				var up = Vector3.UP
-				var right = forward.cross(up).normalized() * width
-
-				# Top vertices
-				var v1a = p1 - right
-				var v1b = p1 + right
-				var v2a = p2 - right
-				var v2b = p2 + right
-
-				# Bottom vertices (lowered by height)
-				var v1a_b = v1a - up * height
-				var v1b_b = v1b - up * height
-				var v2a_b = v2a - up * height
-				var v2b_b = v2b - up * height
-
-				var normal_up = Vector3.UP
-				var normal_down = -Vector3.UP
-				var normal_left = -right.normalized()
-				var normal_right = right.normalized()
-
-				# --- Top Face (road surface)
-				st.add_vertex(v1a)
-				st.add_vertex(v2a)
-				st.add_vertex(v2b)
-
-				st.add_vertex(v1a)
-				st.add_vertex(v2b)
-				st.add_vertex(v1b)
-
-				# --- Bottom Face (underside)
-				st.add_vertex(v1b_b)
-				st.add_vertex(v2b_b)
-				st.add_vertex(v2a_b)
-
-				st.add_vertex(v1b_b)
-				st.add_vertex(v2a_b)
-				st.add_vertex(v1a_b)
-
-				# --- Left Face
-				st.add_vertex(v1a_b)
-				st.add_vertex(v2a_b)
-				st.add_vertex(v2a)
-
-				st.add_vertex(v1a_b)
-				st.add_vertex(v2a)
-				st.add_vertex(v1a)
-
-				# --- Right Face
-				st.add_vertex(v1b)
-				st.add_vertex(v2b)
-				st.add_vertex(v2b_b)
-
-				st.add_vertex(v1b)
-				st.add_vertex(v2b_b)
-				st.add_vertex(v1b_b)
-
-			# Commit mesh
-			var mesh := st.commit()
-			mesh.surface_set_material(0, ROAD)
-
-			# Create MeshInstance3D at center
-			var mesh_instance := MeshInstance3D.new()
-			mesh_instance.mesh = mesh
-			mesh_instance.position = center
-			mesh_instance.create_trimesh_collision()
-			bridges.add_child(mesh_instance)
-	
-	bridges.rotation_degrees = Vector3(-90, 0, 0)
-	bridges.position.z = -5
+			bridges.append(path)
 	call_deferred("bridges_callback")
 
 
 func bridges_callback():
 	bridges_thread.wait_to_finish()
 	threads[1] = true
-	WorldOrigin.add_child(bridges)
+	WorldOrigin.add_child(bridges_container)
+	
+	for bridge in bridges:
+		var curve : Curve3D = bridge.curve
+		var st := SurfaceTool.new()
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+
+		var points := []
+		var d := 0.0
+		while d < curve.get_baked_length():
+			points.append(curve.sample_baked(d))
+			d += 2
+
+		# Compute center offset
+		var center := Vector3.ZERO
+		for p in points:
+			center += p
+		center /= points.size()
+
+		var width = 6.0
+		var height = 3
+
+		for i in range(points.size() - 1):
+			var p1 = points[i] - center
+			var p2 = points[i + 1] - center
+
+			p1 = p1 + (p1 - p2) * 0.1
+			p2 = p2 + (p2 - p1) * 0.1
+
+			var forward = (p2 - p1).normalized()
+			var up = Vector3.UP
+			var right = forward.cross(up).normalized() * width
+
+			# Top vertices
+			var v1a = p1 - right
+			var v1b = p1 + right
+			var v2a = p2 - right
+			var v2b = p2 + right
+
+			# Bottom vertices (lowered by height)
+			var v1a_b = v1a - up * height
+			var v1b_b = v1b - up * height
+			var v2a_b = v2a - up * height
+			var v2b_b = v2b - up * height
+
+			var normal_up = Vector3.UP
+			var normal_down = -Vector3.UP
+			var normal_left = -right.normalized()
+			var normal_right = right.normalized()
+
+			# --- Top Face (road surface)
+			st.add_vertex(v1a)
+			st.add_vertex(v2a)
+			st.add_vertex(v2b)
+
+			st.add_vertex(v1a)
+			st.add_vertex(v2b)
+			st.add_vertex(v1b)
+
+			# --- Bottom Face (underside)
+			st.add_vertex(v1b_b)
+			st.add_vertex(v2b_b)
+			st.add_vertex(v2a_b)
+
+			st.add_vertex(v1b_b)
+			st.add_vertex(v2a_b)
+			st.add_vertex(v1a_b)
+
+			# --- Left Face
+			st.add_vertex(v1a_b)
+			st.add_vertex(v2a_b)
+			st.add_vertex(v2a)
+
+			st.add_vertex(v1a_b)
+			st.add_vertex(v2a)
+			st.add_vertex(v1a)
+
+			# --- Right Face
+			st.add_vertex(v1b)
+			st.add_vertex(v2b)
+			st.add_vertex(v2b_b)
+
+			st.add_vertex(v1b)
+			st.add_vertex(v2b_b)
+			st.add_vertex(v1b_b)
+
+		# Commit mesh
+		var mesh := st.commit()
+		mesh.surface_set_material(0, ROAD)
+
+		# Create MeshInstance3D at center
+		var mesh_instance := MeshInstance3D.new()
+		mesh_instance.mesh = mesh
+		mesh_instance.position = center
+		mesh_instance.create_trimesh_collision()
+		bridges_container.add_child(mesh_instance)
+	
+	bridges_container.rotation_degrees = Vector3(-90, 0, 0)
+	bridges_container.position.z = -5
+	
 	print("Bridges: " + str(Time.get_ticks_msec() - t0))
 
 func generate_buildings():
@@ -272,13 +287,7 @@ func generate_buildings():
 	
 	for building in FileLoader.loaded_multipolys:
 		if building.properties.building != "-1" or building.properties.building != "-1":
-			var building_csg = CSGPolygon3D.new()
-			building_csg.polygon = building.geometry.coordinates[0]
-			building_csg.operation = CSGPolygon3D.OPERATION_UNION
-			building_csg.depth = pow(polygon_area(building.geometry.coordinates[0]), 0.22) * 3
-			building_csg.material = BUILDING
-			building_csg.use_collision = true
-			building_container.add_child(building_csg)
+			builds.append(building.geometry.coordinates[0])
 	
 	building_container.name = "BUILDINGS"
 	
@@ -288,6 +297,16 @@ func building_callback():
 	building_thread.wait_to_finish()
 	threads[2] = true
 	WorldOrigin.add_child(building_container)
+	
+	for build in builds:
+			var building_csg = CSGPolygon3D.new()
+			building_csg.polygon = build
+			building_csg.operation = CSGPolygon3D.OPERATION_UNION
+			building_csg.depth = pow(polygon_area(build), 0.22) * 3
+			building_csg.material = BUILDING
+			building_csg.use_collision = true
+			building_container.add_child(building_csg)
+			
 	print("Buildings: " + str(Time.get_ticks_msec() - t0))
 
 func polygon_area(points: PackedVector2Array) -> float:
@@ -300,7 +319,7 @@ func polygon_area(points: PackedVector2Array) -> float:
 
 func generate_terrain():
 	base_terrain = CSGCombiner3D.new()
-	var water_total = CSGCombiner3D.new()
+	water_total = CSGCombiner3D.new()
 	
 	var grass = CSGPolygon3D.new()
 	grass.polygon = PackedVector2Array([
@@ -315,30 +334,15 @@ func generate_terrain():
 
 	for feature in FileLoader.loaded_multipolys:
 		if feature.properties.water != "-1" or feature.properties.waterway != "-1":
-			var water = CSGPolygon3D.new()
-			water.polygon = feature.geometry.coordinates[0]
-			water.depth = 5
-			water.operation = CSGPolygon3D.OPERATION_UNION
-			water_total.add_child(water)
-		if feature.properties.landuse == "resedential":
-			var resedential = CSGPolygon3D.new()
-			resedential.polygon = feature.geometry.coordinates[0]
-			resedential.depth = 5.01
-			resedential.operation = CSGPolygon3D.OPERATION_UNION
-			resedential.material = GRAVEL
-			base_terrain.add_child(resedential)
-				
+			waters.append(feature.geometry.coordinates[0])
+	
 	for feature in FileLoader.loaded_lines:
 		if "Brayford" in feature.properties.name:
 			pass
 		if feature.properties.water != "-1" or feature.properties.waterway != "-1":
 			var poly = feature.geometry.as_polygon(3)
 			for discrete_poly in poly:
-				var water = CSGPolygon3D.new()
-				water.polygon = discrete_poly
-				water.depth = 5
-				water.operation = CSGPolygon3D.OPERATION_UNION
-				water_total.add_child(water)
+				waters.append(discrete_poly)
 	
 	base_terrain.add_child(grass)
 	water_total.operation = CSGShape3D.OPERATION_SUBTRACTION
@@ -353,6 +357,14 @@ func terrain_callback():
 	terrain_thread.wait_to_finish()
 	threads[3] = true
 	WorldOrigin.add_child(base_terrain)
+	
+	for water in waters:
+		var csg = CSGPolygon3D.new()
+		csg.polygon = water
+		csg.depth = 5
+		csg.operation = CSGPolygon3D.OPERATION_UNION
+		water_total.add_child(csg)
+	
 	print("Terrain: " + str(Time.get_ticks_msec() - t0))
 
 func gen_step():
