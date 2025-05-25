@@ -7,6 +7,7 @@ const PAVED_BRICK = preload("res://Material/paved_brick.tres")
 const GRAVEL = preload("res://Material/gravel.tres")
 const ROAD = preload("res://Material/road.tres")
 const RAIL = preload("res://Material/rail.tres")
+@onready var debug_camera: Camera3D = $"../DebugCamera"
 
 @onready var anchor: Node3D = $Anchor
 @onready var WorldOrigin: StoredWorldInfo = $WorldOrigin
@@ -26,11 +27,11 @@ var path_total : CSGCombiner3D
 var building_container : Node3D
 var bridges_container : Node3D
 
-var paths : Array[PackedVector2Array]
-var roads : Array[PackedVector2Array]
-var rails : Array[PackedVector2Array]
-var builds : Array[PackedVector2Array]
-var waters : Array[PackedVector2Array]
+var paths : Array[PackedVector2Array] = [] as Array[PackedVector2Array]
+var roads : Array[PackedVector2Array] = [] as Array[PackedVector2Array]
+var rails : Array[PackedVector2Array] = [] as Array[PackedVector2Array]
+var builds : Array[PackedVector2Array] = [] as Array[PackedVector2Array]
+var waters : Array[PackedVector2Array] = [] as Array[PackedVector2Array]
 var bridges : Array[Path3D]
 
 var t0 : float
@@ -126,8 +127,6 @@ func generate_paths():
 
 func paths_callback():
 	path_thread.wait_to_finish()
-	print("Paths: " + str(Time.get_ticks_msec() - t0))
-	threads[0] = true
 	path_total = CSGCombiner3D.new()
 	
 	for path in paths:
@@ -153,7 +152,8 @@ func paths_callback():
 		path_total.add_child(csg)
 		
 	WorldOrigin.add_child(path_total)
-	
+	path_total.use_collision = true
+	threads[0] = true
 	print("Paths: " + str(Time.get_ticks_msec() - t0))
 	
 
@@ -179,7 +179,6 @@ func generate_bridges():
 
 func bridges_callback():
 	bridges_thread.wait_to_finish()
-	threads[1] = true
 	WorldOrigin.add_child(bridges_container)
 	
 	for bridge in bridges:
@@ -280,6 +279,7 @@ func bridges_callback():
 	bridges_container.rotation_degrees = Vector3(-90, 0, 0)
 	bridges_container.position.z = -5
 	
+	threads[1] = true
 	print("Bridges: " + str(Time.get_ticks_msec() - t0))
 
 func generate_buildings():
@@ -295,7 +295,6 @@ func generate_buildings():
 
 func building_callback():
 	building_thread.wait_to_finish()
-	threads[2] = true
 	WorldOrigin.add_child(building_container)
 	
 	for build in builds:
@@ -307,6 +306,7 @@ func building_callback():
 			building_csg.use_collision = true
 			building_container.add_child(building_csg)
 			
+	threads[2] = true
 	print("Buildings: " + str(Time.get_ticks_msec() - t0))
 
 func polygon_area(points: PackedVector2Array) -> float:
@@ -355,7 +355,6 @@ func generate_terrain():
 
 func terrain_callback():
 	terrain_thread.wait_to_finish()
-	threads[3] = true
 	WorldOrigin.add_child(base_terrain)
 	
 	for water in waters:
@@ -365,6 +364,7 @@ func terrain_callback():
 		csg.operation = CSGPolygon3D.OPERATION_UNION
 		water_total.add_child(csg)
 	
+	threads[3] = true
 	print("Terrain: " + str(Time.get_ticks_msec() - t0))
 
 func gen_step():

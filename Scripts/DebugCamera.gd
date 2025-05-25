@@ -10,6 +10,7 @@ var move_speed: float:
 			return base_move_speed
 
 func _ready():
+	current = false
 	rotation_degrees = Vector3(-60, 0, 0)
 
 func _process(_delta: float):
@@ -29,4 +30,6 @@ func _process(_delta: float):
 		rotation_degrees += Vector3(0, 3, 0)
 	if (Input.is_action_pressed("rotate_right")):
 		rotation_degrees -= Vector3(0, 3, 0)
+	if (Input.is_action_just_pressed("toggle_debug_cam")):
+		current = !current
 	pass

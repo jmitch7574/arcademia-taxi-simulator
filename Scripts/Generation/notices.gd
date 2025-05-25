@@ -8,3 +8,7 @@ func _on_generator_event(message: String) -> void:
 	
 	add_child(label)
 	pass # Replace with function body.
+
+
+func _on_generator_file_loaded() -> void:
+	get_parent().queue_free()

@@ -18,7 +18,7 @@ grow_vertical = 2
 anchors_preset = 0
 offset_right = 640.0
 offset_bottom = 360.0
-scale = Vector2(1.00487, 1.00487)
+scale = Vector2(0.60487, 0.60487)
 
 [node name="Start" type="Control" parent="MainMenuSlide"]
 anchors_preset = 0

@@ -46,5 +46,6 @@ directional_shadow_blend_splits = true
 directional_shadow_max_distance = 1000.0
 
 [connection signal="file_loaded" from="Generator" to="." method="_on_generator_file_loaded"]
+[connection signal="file_loaded" from="Generator" to="Generator/UI/Notices" method="_on_generator_file_loaded"]
 
 [editable path="Generator"]

@@ -28,8 +28,8 @@ size = Vector3(0.894634, 0.594749, 0.770004)
 transform = Transform3D(-1, 4.45018e-08, 7.52485e-08, 8.74221e-08, 0.505582, 0.862778, 3.50918e-10, 0.862778, -0.505582, 0, 30.1686, -1.32322)
 script = ExtResource("1_54ss2")
 target = NodePath("../Taxi")
-follow_distance = 8.0
-height = 9.5
+follow_distance = 5.0
+height = 12.0
 
 [node name="Taxi" type="VehicleBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74683, 0)
@@ -38,6 +38,7 @@ center_of_mass = Vector3(0, 0, 0.2)
 inertia = Vector3(10, 0, 10)
 angular_damp = 10.744
 script = ExtResource("2_3wxun")
+MAX_STEER = 0.7
 ENGINE_POWER = 300
 
 [node name="Mesh" type="MeshInstance3D" parent="Taxi"]

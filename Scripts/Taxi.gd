@@ -15,8 +15,15 @@ func _physics_process(delta: float) -> void:
 	
 	if linear_velocity.length() > MAX_SPEED:
 		linear_velocity = linear_velocity.normalized() * MAX_SPEED
-		
 	
+	if are_all_wheels_off():
+		time_upside += delta
+		if time_upside > 4:
+			rotation_degrees = Vector3(0, rotation_degrees.y, 0)
+			apply_force(Vector3.UP)
+			time_upside = 2
+	else:
+		time_upside = 0
 func are_all_wheels_off():
 	for child in get_children():
 		if child is VehicleWheel3D:
