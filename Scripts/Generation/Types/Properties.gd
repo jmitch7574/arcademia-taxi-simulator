@@ -12,3 +12,4 @@ var lanes : int
 var railway : String
 var ref : String
 var bridge : String
+var landuse : String

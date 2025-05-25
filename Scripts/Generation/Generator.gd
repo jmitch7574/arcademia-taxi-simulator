@@ -84,7 +84,7 @@ func generate_paths():
 			for discrete_poly in poly:
 				var path = CSGPolygon3D.new()
 				path.polygon = discrete_poly
-				path.depth = 5.01
+				path.depth = 5.05
 				path.material = GRAVEL
 				path.operation = CSGPolygon3D.OPERATION_UNION
 				path_total.add_child(path)
@@ -94,7 +94,7 @@ func generate_paths():
 			for discrete_poly in poly:
 				var path = CSGPolygon3D.new()
 				path.polygon = discrete_poly
-				path.depth = 5.02
+				path.depth = 5.1
 				path.material = ROAD
 				path.operation = CSGPolygon3D.OPERATION_UNION
 				road_total.add_child(path)
@@ -276,11 +276,10 @@ func generate_terrain():
 	event.emit("Created Terrain")
 	
 	grass.depth = 5
+	grass.material = GRASS
 
 	
 	for feature in FileLoader.loaded_multipolys:
-		if "Brayford" in feature.properties.name:
-			pass
 		if feature.properties.water != "-1" or feature.properties.waterway != "-1":
 			for poly in feature.geometry.coordinates:
 				var water = CSGPolygon3D.new()
@@ -288,6 +287,14 @@ func generate_terrain():
 				water.depth = 5
 				water.operation = CSGPolygon3D.OPERATION_UNION
 				water_total.add_child(water)
+		if feature.properties.landuse == "resedential":
+			for poly in feature.geometry.coordinates:
+				var resedential = CSGPolygon3D.new()
+				resedential.polygon = poly
+				resedential.depth = 5.01
+				resedential.operation = CSGPolygon3D.OPERATION_UNION
+				resedential.material = GRAVEL
+				base_terrain.add_child(resedential)
 				
 	for feature in FileLoader.loaded_lines:
 		if "Brayford" in feature.properties.name:
@@ -308,7 +315,6 @@ func generate_terrain():
 	base_terrain.use_collision = true
 	
 	
-	base_terrain.material_override = GRASS
 	base_terrain.name = "TERRAIN"
 	WorldOrigin.add_child(base_terrain)
 

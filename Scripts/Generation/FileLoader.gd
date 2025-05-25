@@ -95,6 +95,7 @@ static func parse_properties(feature) -> GeoJsonProperties:
 	new_props.railway = get_value(feat_props, "railway", "-1")
 	new_props.ref = get_value(feat_props, "ref", "-1")
 	new_props.bridge = get_value(feat_props, "bridge", "no")
+	new_props.landuse = get_value(feat_props, "landuse", "-1")
 	
 	return new_props
 
