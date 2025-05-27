@@ -14,9 +14,6 @@ const GRASS = preload("res://Material/grass.tres")
 ## Building material
 const BUILDING = preload("res://Material/building.tres")
 
-## Paved Brick Material supposed to be used for high street, goes unused in game, but might be brought back in an update
-const PAVED_BRICK = preload("res://Material/paved_brick.tres")
-
 ## Gravel material for paths
 const GRAVEL = preload("res://Material/gravel.tres")
 
