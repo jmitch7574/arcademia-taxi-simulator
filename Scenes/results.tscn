@@ -58,6 +58,7 @@ sky_rotation = Vector3(0, 0, -0.715585)
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hgjej"]
 render_priority = 0
 shader = ExtResource("2_txdwj")
+shader_parameter/multi = 1.05
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0jydw"]
 next_pass = SubResource("ShaderMaterial_hgjej")

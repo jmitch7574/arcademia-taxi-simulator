@@ -7,10 +7,13 @@
 [ext_resource type="ArrayMesh" uid="uid://34xjicpesaog" path="res://Models/taxi.obj" id="5_nkwvc"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_54ss2"]
+rough = true
+absorbent = true
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_54ss2"]
 render_priority = 0
 shader = ExtResource("4_hseqk")
+shader_parameter/multi = 1.2
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cjhh8"]
 next_pass = SubResource("ShaderMaterial_54ss2")
@@ -37,10 +40,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74683, 0)
 mass = 80.0
 physics_material_override = SubResource("PhysicsMaterial_54ss2")
 center_of_mass_mode = 1
-center_of_mass = Vector3(0, -0.1, 0)
-inertia = Vector3(10, 0, 10)
+center_of_mass = Vector3(0, -0.2, 0)
+angular_damp = 10.0
 script = ExtResource("2_3wxun")
-MAX_STEER = 0.1
+MAX_STEER = 0.2
 ENGINE_POWER = 300
 
 [node name="Mesh" type="MeshInstance3D" parent="Taxi"]
@@ -53,37 +56,41 @@ transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -0.0193825, 0.80642, -0.01826
 shape = SubResource("BoxShape3D_54ss2")
 
 [node name="VehicleWheel3D" type="VehicleWheel3D" parent="Taxi"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18995, 0.409232, 1.00109)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.409, 1.001)
 use_as_steering = true
 wheel_roll_influence = 0.6
 wheel_radius = 0.25
-suspension_travel = 2.0
-suspension_stiffness = 40.0
-damping_compression = 0.88
+suspension_travel = 3.0
+suspension_stiffness = 70.0
+damping_compression = 1.0
+damping_relaxation = 1.5
 
 [node name="VehicleWheel3D2" type="VehicleWheel3D" parent="Taxi"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18995, 0.409232, -0.903437)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.409, -0.903)
 use_as_traction = true
 wheel_roll_influence = 0.6
 wheel_radius = 0.25
-suspension_travel = 2.0
-suspension_stiffness = 40.0
-damping_compression = 0.88
+suspension_travel = 3.0
+suspension_stiffness = 70.0
+damping_compression = 1.0
+damping_relaxation = 1.5
 
 [node name="VehicleWheel3D3" type="VehicleWheel3D" parent="Taxi"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.25474, 0.409232, 1.00109)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.409, 1.001)
 use_as_steering = true
 wheel_roll_influence = 0.6
 wheel_radius = 0.25
-suspension_travel = 2.0
-suspension_stiffness = 40.0
-damping_compression = 0.88
+suspension_travel = 3.0
+suspension_stiffness = 70.0
+damping_compression = 1.0
+damping_relaxation = 1.5
 
 [node name="VehicleWheel3D4" type="VehicleWheel3D" parent="Taxi"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.25474, 0.409232, -0.903437)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.409, -0.903)
 use_as_traction = true
 wheel_roll_influence = 0.6
 wheel_radius = 0.25
-suspension_travel = 2.0
-suspension_stiffness = 40.0
-damping_compression = 0.88
+suspension_travel = 3.0
+suspension_stiffness = 70.0
+damping_compression = 1.0
+damping_relaxation = 1.5

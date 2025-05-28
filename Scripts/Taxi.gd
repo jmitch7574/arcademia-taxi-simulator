@@ -20,19 +20,20 @@ func _physics_process(delta: float) -> void:
 		linear_velocity = linear_velocity.normalized() * MAX_SPEED
 	
 	if Input.is_action_just_pressed("reset_pos"):
-		position = Vector3(0, 0, 0)
+		position = Vector3(0, 5, 0)
 		rotation_degrees = Vector3(0, 0, 0)
 	
 	if are_all_wheels_off():
 		time_upside += delta
 		if time_upside > 4:
-			position = Vector3(0, 0, 0)
+			position = Vector3(0, 5, 0)
 			rotation_degrees = Vector3(0, 0, 0)
+			time_upside = 0
 	else:
 		time_upside = 0
 		
 	if global_position.y < -8:
-		position = Vector3(0, 0, 0)
+		position = Vector3(0, 5, 0)
 		rotation_degrees = Vector3(0, 0, 0)
 
 func are_all_wheels_off():

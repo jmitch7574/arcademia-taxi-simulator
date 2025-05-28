@@ -1,8 +1,10 @@
 shader_type spatial;
 render_mode cull_front;
 
+uniform float multi = 1.05;
+
 void vertex() {
-	VERTEX *= 1.05;
+	VERTEX *= multi;
 }
 
 void fragment() {
