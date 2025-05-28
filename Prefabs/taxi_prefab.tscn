@@ -1,4 +1,3 @@
-@ -0,0 +1,89 @@
 [gd_scene load_steps=10 format=3 uid="uid://d2s0622d75adx"]
 
 [ext_resource type="Script" uid="uid://pc2qwg871wcx" path="res://Scripts/TaxiCamera.gd" id="1_54ss2"]
@@ -24,7 +23,7 @@ metallic_specular = 0.0
 roughness = 0.1
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_54ss2"]
-size = Vector3(0.894634, 0.594749, 0.770004)
+size = Vector3(0.894634, 0.490734, 0.770004)
 
 [node name="TaxiPrefab" type="Node3D"]
 
@@ -32,7 +31,6 @@ size = Vector3(0.894634, 0.594749, 0.770004)
 transform = Transform3D(-1, 4.45018e-08, 7.52485e-08, 8.74221e-08, 0.505582, 0.862778, 3.50918e-10, 0.862778, -0.505582, 0, 30.1686, -1.32322)
 script = ExtResource("1_54ss2")
 target = NodePath("../Taxi")
-height = 32.0
 
 [node name="Taxi" type="VehicleBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74683, 0)
@@ -51,11 +49,11 @@ mesh = ExtResource("5_nkwvc")
 skeleton = NodePath("../../..")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Taxi"]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -0.0193825, 0.80642, -0.0182673)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -0.0193825, 0.910435, -0.0182673)
 shape = SubResource("BoxShape3D_54ss2")
 
 [node name="VehicleWheel3D" type="VehicleWheel3D" parent="Taxi"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18995, 0.409232, 1.00109)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.409, 1.001)
 use_as_steering = true
 wheel_roll_influence = 0.6
 wheel_radius = 0.25
