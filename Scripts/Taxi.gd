@@ -31,6 +31,7 @@ func _physics_process(delta: float) -> void:
 	steering = Input.get_axis("move_right", "move_left") * steering_strength
 	engine_force = Input.get_axis("b_button", "a_button") * BASE_POWER
 	
+	
 	if (Input.is_action_pressed("c_button") and not are_all_wheels_off()):
 			back_left.brake = 500
 			back_right.brake = 500
