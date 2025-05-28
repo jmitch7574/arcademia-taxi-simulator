@@ -2,10 +2,10 @@ extends Camera3D
 
 @export var target: Node3D  # assign your taxi/player here
 @export var follow_distance: float = 10.0
-@export var height: float = 4.0
+@export var height: float = 32.0
 @export var smooth_speed: float = 5.0
 
-func _process(delta):
+func _physics_process(delta):
 	if not target:
 		return
 
