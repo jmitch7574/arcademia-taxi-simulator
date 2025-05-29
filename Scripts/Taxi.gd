@@ -8,9 +8,9 @@ extends VehicleBody3D
 var steering_strength:
 	get:
 		if (Input.is_action_pressed("c_button") and not are_all_wheels_off()):
-			return BASE_STEER * 2
+			return BASE_STEER * 2.25
 		else:
-			return BASE_STEER
+			return BASE_STEER / max((linear_velocity.length() * 4) / BASE_TOP_SPEED, 1)
 
 
 var time_upside = 0
@@ -23,6 +23,12 @@ var brake_force : float = 0
 @onready var front_right: VehicleWheel3D = $FrontRight
 @onready var back_right: VehicleWheel3D = $BackRight
 
+@onready var skid_left_b: GPUParticles3D = $SkidLeftB
+@onready var skid_right_b: GPUParticles3D = $SkidRightB
+@onready var skid_left_f: GPUParticles3D = $SkidLeftF
+@onready var skid_right_f: GPUParticles3D = $SkidRightF
+
+
 
 func _ready() -> void:
 	base_friction = front_left.wheel_friction_slip
@@ -33,13 +39,21 @@ func _physics_process(delta: float) -> void:
 	
 	
 	if (Input.is_action_pressed("c_button") and not are_all_wheels_off()):
-		back_left.brake = 600
-		back_right.brake = 600
+		skid_left_b.amount_ratio = 1
+		skid_right_b.amount_ratio = 1
+		skid_left_f.amount_ratio = 1
+		skid_right_f.amount_ratio = 1
+		brake = 600
 		back_left.wheel_friction_slip = base_friction / 5
 		back_right.wheel_friction_slip = base_friction / 5
 		front_left.wheel_friction_slip = base_friction / 5
 		front_right.wheel_friction_slip = base_friction / 5
 	else:
+		skid_left_b.amount_ratio = 0
+		skid_right_b.amount_ratio = 0
+		skid_left_f.amount_ratio = 0
+		skid_right_f.amount_ratio = 0
+		brake = 0
 		back_left.brake = 0
 		back_right.brake = 0
 		back_left.wheel_friction_slip = base_friction

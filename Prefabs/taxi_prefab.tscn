@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://d2s0622d75adx"]
+[gd_scene load_steps=29 format=3 uid="uid://d2s0622d75adx"]
 
 [ext_resource type="Script" uid="uid://pc2qwg871wcx" path="res://Scripts/TaxiCamera.gd" id="1_54ss2"]
 [ext_resource type="Script" uid="uid://dxjwoaqb8waef" path="res://Scripts/Taxi.gd" id="2_3wxun"]
@@ -86,7 +86,29 @@ _data = [Vector2(0.603286, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.499552), 0.0, 0.0, 0
 point_count = 2
 
 [sub_resource type="Gradient" id="Gradient_54ss2"]
+offsets = PackedFloat32Array(0.8125, 1)
 colors = PackedColorArray(0, 0, 0, 0.839216, 0.111197, 0.111197, 0.111197, 0)
+
+[sub_resource type="Curve" id="Curve_nkwvc"]
+_data = [Vector2(0.42487, 0.729429), 0.0, -2.31845, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_xdevp"]
+curve = SubResource("Curve_nkwvc")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_3wxun"]
+gravity = Vector3(0, 0, 0)
+color = Color(0.165656, 0.165656, 0.165656, 1)
+alpha_curve = SubResource("CurveTexture_xdevp")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lmvui"]
+transparency = 1
+vertex_color_use_as_albedo = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_hseqk"]
+material = SubResource("StandardMaterial3D_lmvui")
+size = Vector2(0.5, 0.5)
+orientation = 1
 
 [node name="TaxiPrefab" type="Node3D"]
 
@@ -103,7 +125,7 @@ center_of_mass_mode = 1
 center_of_mass = Vector3(0, -0.1, 0)
 inertia = Vector3(10, 0, 10)
 script = ExtResource("2_3wxun")
-BASE_STEER = 0.065
+BASE_STEER = 0.15
 BASE_POWER = 250
 BASE_TOP_SPEED = 35
 
@@ -170,3 +192,35 @@ angular_velocity_max = 45.0
 scale_amount_curve = SubResource("Curve_hseqk")
 color = Color(0.0253638, 0.0253638, 0.0253638, 0.807843)
 color_ramp = SubResource("Gradient_54ss2")
+
+[node name="SkidLeftB" type="GPUParticles3D" parent="Taxi"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.476058, 0.0368446, -0.721136)
+amount = 4000
+lifetime = 4.0
+fixed_fps = 0
+process_material = SubResource("ParticleProcessMaterial_3wxun")
+draw_pass_1 = SubResource("QuadMesh_hseqk")
+
+[node name="SkidRightB" type="GPUParticles3D" parent="Taxi"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.692729, 0.0368446, -0.721136)
+amount = 4000
+lifetime = 4.0
+fixed_fps = 0
+process_material = SubResource("ParticleProcessMaterial_3wxun")
+draw_pass_1 = SubResource("QuadMesh_hseqk")
+
+[node name="SkidLeftF" type="GPUParticles3D" parent="Taxi"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.476058, 0.0368446, 1.15972)
+amount = 4000
+lifetime = 4.0
+fixed_fps = 0
+process_material = SubResource("ParticleProcessMaterial_3wxun")
+draw_pass_1 = SubResource("QuadMesh_hseqk")
+
+[node name="SkidRightF" type="GPUParticles3D" parent="Taxi"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.692729, 0.0368446, 1.15972)
+amount = 4000
+lifetime = 4.0
+fixed_fps = 0
+process_material = SubResource("ParticleProcessMaterial_3wxun")
+draw_pass_1 = SubResource("QuadMesh_hseqk")
