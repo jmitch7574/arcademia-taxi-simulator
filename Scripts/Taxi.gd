@@ -7,8 +7,8 @@ extends VehicleBody3D
 
 var steering_strength:
 	get:
-		if (Input.is_action_pressed("c_button") and not are_all_wheels_off()):
-			return BASE_STEER * 2.25
+		if Input.is_action_pressed(&"c_button"):
+			return BASE_STEER / max((linear_velocity.length() * 2.5) / BASE_TOP_SPEED, 1)
 		else:
 			return BASE_STEER / max((linear_velocity.length() * 4) / BASE_TOP_SPEED, 1)
 
@@ -41,8 +41,6 @@ func _physics_process(delta: float) -> void:
 	squeal.volume_db = -(BASE_TOP_SPEED) + linear_velocity.length()
 	
 	if (Input.is_action_pressed("c_button") and not are_all_wheels_off()):
-		if not squeal.playing: 
-			squeal.playing = true
 		skid_left_b.amount_ratio = 1
 		skid_right_b.amount_ratio = 1
 		skid_left_f.amount_ratio = 1
@@ -50,8 +48,10 @@ func _physics_process(delta: float) -> void:
 		brake = 600
 		back_left.wheel_friction_slip = base_friction / 5
 		back_right.wheel_friction_slip = base_friction / 5
-		front_left.wheel_friction_slip = base_friction / 5
-		front_right.wheel_friction_slip = base_friction / 5
+		front_left.wheel_friction_slip = base_friction / 4.8
+		front_right.wheel_friction_slip = base_friction / 4.8
+		if not squeal.playing: 
+			squeal.playing = true
 	else:
 		squeal.playing = false
 		skid_left_b.amount_ratio = 0
