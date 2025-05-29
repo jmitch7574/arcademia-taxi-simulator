@@ -1,10 +1,12 @@
-[gd_scene load_steps=29 format=3 uid="uid://d2s0622d75adx"]
+[gd_scene load_steps=31 format=3 uid="uid://d2s0622d75adx"]
 
 [ext_resource type="Script" uid="uid://pc2qwg871wcx" path="res://Scripts/TaxiCamera.gd" id="1_54ss2"]
 [ext_resource type="Script" uid="uid://dxjwoaqb8waef" path="res://Scripts/Taxi.gd" id="2_3wxun"]
 [ext_resource type="Texture2D" uid="uid://chsrr3d3rrfty" path="res://Models/colormap.png" id="3_lmvui"]
 [ext_resource type="Shader" uid="uid://dgub333v0e0hi" path="res://Shaders/outline.gdshader" id="4_hseqk"]
 [ext_resource type="ArrayMesh" uid="uid://34xjicpesaog" path="res://Models/taxi.obj" id="5_nkwvc"]
+[ext_resource type="AudioStream" uid="uid://nw2fmx7667hi" path="res://SFX/engine-loop-1-normalized.wav" id="6_3wxun"]
+[ext_resource type="AudioStream" uid="uid://dqr10nlbe3u1h" path="res://SFX/tires_squal_loop.wav" id="7_lmvui"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_54ss2"]
 
@@ -224,3 +226,11 @@ lifetime = 4.0
 fixed_fps = 0
 process_material = SubResource("ParticleProcessMaterial_3wxun")
 draw_pass_1 = SubResource("QuadMesh_hseqk")
+
+[node name="Engine" type="AudioStreamPlayer3D" parent="Taxi"]
+stream = ExtResource("6_3wxun")
+volume_db = -5.0
+autoplay = true
+
+[node name="Squeal" type="AudioStreamPlayer3D" parent="Taxi"]
+stream = ExtResource("7_lmvui")

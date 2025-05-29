@@ -28,7 +28,8 @@ var brake_force : float = 0
 @onready var skid_left_f: GPUParticles3D = $SkidLeftF
 @onready var skid_right_f: GPUParticles3D = $SkidRightF
 
-
+@onready var engine: AudioStreamPlayer3D = $Engine
+@onready var squeal: AudioStreamPlayer3D = $Squeal
 
 func _ready() -> void:
 	base_friction = front_left.wheel_friction_slip
@@ -36,9 +37,12 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	steering = Input.get_axis("move_right", "move_left") * steering_strength
 	engine_force = Input.get_axis("b_button", "a_button") * BASE_POWER
-	
+	engine.pitch_scale = (linear_velocity.length() / BASE_TOP_SPEED) / 2
+	squeal.volume_db = -(BASE_TOP_SPEED) + linear_velocity.length()
 	
 	if (Input.is_action_pressed("c_button") and not are_all_wheels_off()):
+		if not squeal.playing: 
+			squeal.playing = true
 		skid_left_b.amount_ratio = 1
 		skid_right_b.amount_ratio = 1
 		skid_left_f.amount_ratio = 1
@@ -49,6 +53,7 @@ func _physics_process(delta: float) -> void:
 		front_left.wheel_friction_slip = base_friction / 5
 		front_right.wheel_friction_slip = base_friction / 5
 	else:
+		squeal.playing = false
 		skid_left_b.amount_ratio = 0
 		skid_right_b.amount_ratio = 0
 		skid_left_f.amount_ratio = 0
