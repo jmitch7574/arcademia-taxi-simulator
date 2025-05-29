@@ -33,12 +33,12 @@ func _physics_process(delta: float) -> void:
 	
 	
 	if (Input.is_action_pressed("c_button") and not are_all_wheels_off()):
-			back_left.brake = 500
-			back_right.brake = 500
-			back_left.wheel_friction_slip = base_friction / 5
-			back_right.wheel_friction_slip = base_friction / 5
-			front_left.wheel_friction_slip = base_friction / 5
-			front_right.wheel_friction_slip = base_friction / 5
+		back_left.brake = 600
+		back_right.brake = 600
+		back_left.wheel_friction_slip = base_friction / 5
+		back_right.wheel_friction_slip = base_friction / 5
+		front_left.wheel_friction_slip = base_friction / 5
+		front_right.wheel_friction_slip = base_friction / 5
 	else:
 		back_left.brake = 0
 		back_right.brake = 0
@@ -69,7 +69,7 @@ func _physics_process(delta: float) -> void:
 		rotation_degrees = Vector3(0, 0, 0)
 	
 	if Input.is_action_pressed(&"a_button") and Input.is_action_pressed(&"b_button"):
-		rotation_degrees.y += Input.get_axis("move_right", "move_left") * steering_strength
+		rotation_degrees.y += Input.get_axis("move_right", "move_left") * steering_strength * 2
 		
 
 func are_all_wheels_off():

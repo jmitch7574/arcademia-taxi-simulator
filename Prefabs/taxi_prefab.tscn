@@ -103,8 +103,9 @@ center_of_mass_mode = 1
 center_of_mass = Vector3(0, -0.1, 0)
 inertia = Vector3(10, 0, 10)
 script = ExtResource("2_3wxun")
-BASE_STEER = 0.08
+BASE_STEER = 0.065
 BASE_POWER = 250
+BASE_TOP_SPEED = 35
 
 [node name="Mesh" type="MeshInstance3D" parent="Taxi"]
 material_override = SubResource("StandardMaterial3D_cjhh8")
