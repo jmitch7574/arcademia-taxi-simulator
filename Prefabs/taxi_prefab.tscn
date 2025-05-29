@@ -1,16 +1,20 @@
-[gd_scene load_steps=10 format=3 uid="uid://d2s0622d75adx"]
+[gd_scene load_steps=31 format=3 uid="uid://d2s0622d75adx"]
 
 [ext_resource type="Script" uid="uid://pc2qwg871wcx" path="res://Scripts/TaxiCamera.gd" id="1_54ss2"]
 [ext_resource type="Script" uid="uid://dxjwoaqb8waef" path="res://Scripts/Taxi.gd" id="2_3wxun"]
 [ext_resource type="Texture2D" uid="uid://chsrr3d3rrfty" path="res://Models/colormap.png" id="3_lmvui"]
 [ext_resource type="Shader" uid="uid://dgub333v0e0hi" path="res://Shaders/outline.gdshader" id="4_hseqk"]
 [ext_resource type="ArrayMesh" uid="uid://34xjicpesaog" path="res://Models/taxi.obj" id="5_nkwvc"]
+[ext_resource type="AudioStream" uid="uid://nw2fmx7667hi" path="res://SFX/engine-loop-1-normalized.wav" id="6_3wxun"]
+[ext_resource type="AudioStream" uid="uid://dqr10nlbe3u1h" path="res://SFX/tires_squal_loop.wav" id="7_lmvui"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_54ss2"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_54ss2"]
 render_priority = 0
 shader = ExtResource("4_hseqk")
+shader_parameter/multi = 1.2
+shader_parameter/offset = Vector3(0, 0, 0)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cjhh8"]
 next_pass = SubResource("ShaderMaterial_54ss2")
@@ -22,7 +26,91 @@ metallic_specular = 0.0
 roughness = 0.1
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_54ss2"]
-size = Vector3(0.894634, 0.594749, 0.770004)
+size = Vector3(0.894634, 0.541322, 0.770004)
+
+[sub_resource type="Curve" id="Curve_lmvui"]
+_data = [Vector2(0, 0.484955), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_hseqk"]
+curve = SubResource("Curve_lmvui")
+
+[sub_resource type="Curve" id="Curve_3wxun"]
+_limits = [-360.0, 360.0, 0.0, 1.0]
+_data = [Vector2(0, 303.671), 0.0, 0.0, 0, 0, Vector2(1, -360), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_lmvui"]
+curve = SubResource("Curve_3wxun")
+
+[sub_resource type="Curve" id="Curve_54ss2"]
+_data = [Vector2(0, 1), 0.0, 0.0645269, 0, 0, Vector2(0.994819, 0.497994), -0.0254197, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_3wxun"]
+curve = SubResource("Curve_54ss2")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_54ss2"]
+particle_flag_rotate_y = true
+emission_shape_scale = Vector3(0.2, 0.2, 0.2)
+emission_shape = 1
+emission_sphere_radius = 1.0
+inherit_velocity_ratio = 0.9
+angular_velocity_min = -1.00002
+angular_velocity_max = 0.999984
+angular_velocity_curve = SubResource("CurveTexture_lmvui")
+gravity = Vector3(0, 1, 0)
+scale_curve = SubResource("CurveTexture_3wxun")
+color = Color(0.187176, 0.187176, 0.187176, 1)
+alpha_curve = SubResource("CurveTexture_hseqk")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_54ss2"]
+transparency = 1
+cull_mode = 2
+vertex_color_use_as_albedo = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_54ss2"]
+material = SubResource("StandardMaterial3D_54ss2")
+orientation = 1
+
+[sub_resource type="Skin" id="Skin_3wxun"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3wxun"]
+transparency = 1
+vertex_color_use_as_albedo = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_54ss2"]
+material = SubResource("StandardMaterial3D_3wxun")
+size = Vector2(0.8, 0.8)
+
+[sub_resource type="Curve" id="Curve_hseqk"]
+_data = [Vector2(0.603286, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.499552), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_54ss2"]
+offsets = PackedFloat32Array(0.8125, 1)
+colors = PackedColorArray(0, 0, 0, 0.839216, 0.111197, 0.111197, 0.111197, 0)
+
+[sub_resource type="Curve" id="Curve_nkwvc"]
+_data = [Vector2(0.42487, 0.729429), 0.0, -2.31845, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_xdevp"]
+curve = SubResource("Curve_nkwvc")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_3wxun"]
+gravity = Vector3(0, 0, 0)
+color = Color(0.165656, 0.165656, 0.165656, 1)
+alpha_curve = SubResource("CurveTexture_xdevp")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lmvui"]
+transparency = 1
+vertex_color_use_as_albedo = true
+
+[sub_resource type="QuadMesh" id="QuadMesh_hseqk"]
+material = SubResource("StandardMaterial3D_lmvui")
+size = Vector2(0.5, 0.5)
+orientation = 1
 
 [node name="TaxiPrefab" type="Node3D"]
 
@@ -30,7 +118,6 @@ size = Vector3(0.894634, 0.594749, 0.770004)
 transform = Transform3D(-1, 4.45018e-08, 7.52485e-08, 8.74221e-08, 0.505582, 0.862778, 3.50918e-10, 0.862778, -0.505582, 0, 30.1686, -1.32322)
 script = ExtResource("1_54ss2")
 target = NodePath("../Taxi")
-height = 32.0
 
 [node name="Taxi" type="VehicleBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74683, 0)
@@ -40,8 +127,9 @@ center_of_mass_mode = 1
 center_of_mass = Vector3(0, -0.1, 0)
 inertia = Vector3(10, 0, 10)
 script = ExtResource("2_3wxun")
-MAX_STEER = 0.1
-ENGINE_POWER = 300
+BASE_STEER = 0.2
+BASE_POWER = 250
+BASE_TOP_SPEED = 35
 
 [node name="Mesh" type="MeshInstance3D" parent="Taxi"]
 material_override = SubResource("StandardMaterial3D_cjhh8")
@@ -49,41 +137,100 @@ mesh = ExtResource("5_nkwvc")
 skeleton = NodePath("../../..")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Taxi"]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, -0.0193825, 0.80642, -0.0182673)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0.859725, -0.018)
 shape = SubResource("BoxShape3D_54ss2")
 
-[node name="VehicleWheel3D" type="VehicleWheel3D" parent="Taxi"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18995, 0.409232, 1.00109)
-use_as_steering = true
-wheel_roll_influence = 0.6
-wheel_radius = 0.25
-suspension_travel = 2.0
-suspension_stiffness = 40.0
-damping_compression = 0.88
-
-[node name="VehicleWheel3D2" type="VehicleWheel3D" parent="Taxi"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18995, 0.409232, -0.903437)
+[node name="FrontLeft" type="VehicleWheel3D" parent="Taxi"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.409, 1)
 use_as_traction = true
-wheel_roll_influence = 0.6
-wheel_radius = 0.25
-suspension_travel = 2.0
-suspension_stiffness = 40.0
-damping_compression = 0.88
-
-[node name="VehicleWheel3D3" type="VehicleWheel3D" parent="Taxi"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.25474, 0.409232, 1.00109)
 use_as_steering = true
-wheel_roll_influence = 0.6
-wheel_radius = 0.25
-suspension_travel = 2.0
+wheel_roll_influence = 0.8
+wheel_radius = 0.4
+wheel_friction_slip = 12.0
 suspension_stiffness = 40.0
-damping_compression = 0.88
 
-[node name="VehicleWheel3D4" type="VehicleWheel3D" parent="Taxi"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.25474, 0.409232, -0.903437)
+[node name="BackLeft" type="VehicleWheel3D" parent="Taxi"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0.409, -1)
 use_as_traction = true
-wheel_roll_influence = 0.6
-wheel_radius = 0.25
-suspension_travel = 2.0
+wheel_roll_influence = 0.8
+wheel_radius = 0.4
+wheel_friction_slip = 12.0
 suspension_stiffness = 40.0
-damping_compression = 0.88
+
+[node name="FrontRight" type="VehicleWheel3D" parent="Taxi"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.409, 1)
+use_as_traction = true
+use_as_steering = true
+wheel_roll_influence = 0.8
+wheel_radius = 0.4
+wheel_friction_slip = 12.0
+suspension_stiffness = 40.0
+
+[node name="BackRight" type="VehicleWheel3D" parent="Taxi"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.409, -1)
+use_as_traction = true
+wheel_roll_influence = 0.8
+wheel_radius = 0.4
+wheel_friction_slip = 12.0
+suspension_stiffness = 40.0
+
+[node name="Exhaust" type="GPUParticles3D" parent="Taxi"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.309498, 0.0138072, -1.3689)
+visible = false
+emitting = false
+fixed_fps = 60
+fract_delta = false
+process_material = SubResource("ParticleProcessMaterial_54ss2")
+draw_pass_1 = SubResource("QuadMesh_54ss2")
+draw_skin = SubResource("Skin_3wxun")
+
+[node name="Exhaust2" type="CPUParticles3D" parent="Taxi"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.347162, 0.0654212, -1.25753)
+mesh = SubResource("PlaneMesh_54ss2")
+particle_flag_rotate_y = true
+gravity = Vector3(0, 2, -3)
+angular_velocity_min = -45.0
+angular_velocity_max = 45.0
+scale_amount_curve = SubResource("Curve_hseqk")
+color = Color(0.0253638, 0.0253638, 0.0253638, 0.807843)
+color_ramp = SubResource("Gradient_54ss2")
+
+[node name="SkidLeftB" type="GPUParticles3D" parent="Taxi"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.476058, 0.0368446, -0.721136)
+amount = 4000
+lifetime = 4.0
+fixed_fps = 0
+process_material = SubResource("ParticleProcessMaterial_3wxun")
+draw_pass_1 = SubResource("QuadMesh_hseqk")
+
+[node name="SkidRightB" type="GPUParticles3D" parent="Taxi"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.692729, 0.0368446, -0.721136)
+amount = 4000
+lifetime = 4.0
+fixed_fps = 0
+process_material = SubResource("ParticleProcessMaterial_3wxun")
+draw_pass_1 = SubResource("QuadMesh_hseqk")
+
+[node name="SkidLeftF" type="GPUParticles3D" parent="Taxi"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.476058, 0.0368446, 1.15972)
+amount = 4000
+lifetime = 4.0
+fixed_fps = 0
+process_material = SubResource("ParticleProcessMaterial_3wxun")
+draw_pass_1 = SubResource("QuadMesh_hseqk")
+
+[node name="SkidRightF" type="GPUParticles3D" parent="Taxi"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.692729, 0.0368446, 1.15972)
+amount = 4000
+lifetime = 4.0
+fixed_fps = 0
+process_material = SubResource("ParticleProcessMaterial_3wxun")
+draw_pass_1 = SubResource("QuadMesh_hseqk")
+
+[node name="Engine" type="AudioStreamPlayer3D" parent="Taxi"]
+stream = ExtResource("6_3wxun")
+volume_db = -5.0
+autoplay = true
+
+[node name="Squeal" type="AudioStreamPlayer3D" parent="Taxi"]
+stream = ExtResource("7_lmvui")
