@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://b1k716bi4vw61"]
+
+[node name="VBoxContainer" type="VBoxContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="FoundProfiles" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="TextEdit" type="TextEdit" parent="."]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+placeholder_text = "Save as"
+
+[node name="SaveButton" type="Button" parent="."]
+layout_mode = 2
+text = "Save"
+
+[node name="LoadButton" type="Button" parent="."]
+layout_mode = 2
+text = "Load"
