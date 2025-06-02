@@ -40,6 +40,9 @@ func _process(delta: float) -> void:
 		
 		if dist < 25 and taxi.linear_velocity.length() < 3:
 			complete_fare()
+			
+	if time < 0:
+		get_tree().change_scene_to_file("res://Scenes/results.tscn")
 
 func _on_generator_world_generated() -> void:
 	taxi = TAXI_PREFAB.instantiate()
