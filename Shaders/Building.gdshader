@@ -2,6 +2,8 @@ shader_type spatial; // Or canvas_item for 2D, but spatial for 3D buildings
 
 uniform vec3 roof_colour : source_color;
 uniform vec3 roof_frame : source_color;
+uniform vec3 window_colour : source_color;
+uniform vec3 wall_colour : source_color;
 uniform float noise_scale = 0.1; // Controls the "zoom" of the noise
 uniform float noise_strength = 0.1; // Controls how much the noise affects the color
 uniform sampler2D noise_texture; // A NoiseTexture resource`
@@ -25,11 +27,21 @@ void fragment() {
 	    noise_value = noise_value;
     	ALBEDO = roof_colour * noise_value * noise_strength;
     } else { 
-        float floorH = 4.0;
-        float winW = 4.0;
+        float floorH = 8.0;
+        float winW = 10.0;
         float floor = mod(world_position.y, floorH);
         float column = mod(world_position.x, winW);
-        float window = step(1, abs(floor - floorH * 0.5)) + step(1, abs(column - winW * 0.5));
-        ALBEDO = mix(vec3(0.1), vec3(0.7), 1.0 - window);
+		
+		// Window appears near center of each floor and column
+		float is_floor_centered = step(1.0, abs(floor - floorH * 0.5));
+		float is_column_centered = step(1.5, abs(column - winW * 0.5));
+
+		// If both floor and column are centered, it's a window
+		float window = 1.0 - (is_floor_centered + is_column_centered);
+
+		// Clamp window to 0 or 1
+		window = step(0.5, window);
+
+		ALBEDO = mix(wall_colour, window_colour, window);
     }
 }
