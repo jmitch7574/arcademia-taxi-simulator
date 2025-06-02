@@ -52,4 +52,5 @@ func _save_config() -> void:
 	_load_configs()
 
 func _load_config(name: String) -> void:
-	InputMapManager.load_system(name)
+	InputMapManager.load_system(name)		
+	EditorInterface.restart_editor(true)

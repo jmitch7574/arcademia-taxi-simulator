@@ -1,5 +1,4 @@
 class_name InputMapManager
-extends Node
 
 static var file_path_base = "res://input-maps/"
 static var file_path_user = "user://input-maps/"
@@ -76,8 +75,6 @@ static func load_system(target_file : String) -> void:
 		print("Project settings saved successfully to project.godot!")
 	else:
 		push_error("FAILED to save project settings! Error code: ", save_error) # THIS IS KEY
-	
-	EditorInterface.restart_editor(true)
 	
 static func load_runtime(target_file : String) -> void:
 	var config = ConfigFile.new()
