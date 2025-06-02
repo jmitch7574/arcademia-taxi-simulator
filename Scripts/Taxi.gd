@@ -37,7 +37,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	steering = Input.get_axis(&"turn_right", &"turn_left") * steering_strength
 	engine_force = Input.get_axis(&"reverse", &"accelerate") * BASE_POWER
-	engine.pitch_scale = (linear_velocity.length() / BASE_TOP_SPEED) / 2
+	engine.pitch_scale = max((linear_velocity.length() / BASE_TOP_SPEED) / 2, 0)
 	squeal.volume_db = -(BASE_TOP_SPEED) + linear_velocity.length()
 	
 	if (Input.is_action_pressed(&"handbrake") and not are_all_wheels_off()):
