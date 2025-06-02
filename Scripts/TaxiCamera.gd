@@ -5,10 +5,15 @@ extends Camera3D
 @export var height: float = 32.0
 @export var smooth_speed: float = 5.0
 
+var base_height
+
+func _ready() -> void:
+	base_height = height
+
 func _physics_process(delta):
 	if not target:
 		return
-
+		
 	# Get only the YAW from the target's rotation
 	var target_yaw = target.global_transform.basis.get_euler().y
 	var yaw_only_basis = Basis(Vector3.UP, target_yaw)
@@ -22,3 +27,8 @@ func _physics_process(delta):
 
 	# Look at the target, but use a stable up vector
 	look_at(target.global_transform.origin, Vector3.UP)
+
+	if Input.is_action_pressed(&"zoom_out"):
+		height = base_height * 8
+	else:
+		height = base_height

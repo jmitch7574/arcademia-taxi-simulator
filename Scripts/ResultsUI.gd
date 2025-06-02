@@ -9,10 +9,14 @@ extends Control
 @onready var money_amount: Label = $MoneyAmount
 @onready var fare_amount: Label = $FareAmount
 @onready var final_rank: Label = $FinalRank
+@onready var exit_hint: Label = $ExitHint
 
 func _ready() -> void:
 	money_amount.text = "$" + str(GameRoot.score)
 	fare_amount.text = str(GameRoot.fare_count)
+	
+	if OS.has_feature("arcade_release"):
+		exit_hint.text = "Press D for Main Menu"
 	
 	if GameRoot.score >= 200:
 		final_rank.text = "S"
@@ -32,5 +36,5 @@ func _ready() -> void:
 	pass
 
 func _process(delta: float) -> void:
-	if Input.is_action_just_pressed("d_button"):
+	if Input.is_action_just_pressed(&"ui_cancel"):
 		get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
