@@ -1,8 +1,19 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://bpg74ilxt162w"]
+[gd_resource type="ShaderMaterial" load_steps=4 format=3 uid="uid://fl484n0j5lbm"]
+
+[ext_resource type="Shader" uid="uid://cnarl4cy3mcc1" path="res://Shaders/Building.gdshader" id="1_5edm0"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_oucas"]
+noise_type = 3
+frequency = 0.097
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_a4mp5"]
+noise = SubResource("FastNoiseLite_oucas")
 
 [resource]
-diffuse_mode = 3
-specular_mode = 1
-albedo_color = Color(0.124326, 0.100535, 0.105389, 1)
-metallic_specular = 0.2
-roughness = 0.0
+render_priority = 0
+shader = ExtResource("1_5edm0")
+shader_parameter/roof_colour = Color(0.244848, 0.185876, 0.172477, 1)
+shader_parameter/roof_frame = Color(0, 0, 0, 1)
+shader_parameter/noise_scale = 0.1
+shader_parameter/noise_strength = 2.0
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_a4mp5")
