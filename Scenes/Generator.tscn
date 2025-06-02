@@ -1,8 +1,26 @@
-[gd_scene load_steps=4 format=3 uid="uid://lvwwb7r05irj"]
+[gd_scene load_steps=10 format=3 uid="uid://lvwwb7r05irj"]
 
 [ext_resource type="Script" uid="uid://dx5wt0j425npw" path="res://Scripts/Generation/Generator.gd" id="1_xt47f"]
 [ext_resource type="Script" uid="uid://2qhlpmpywhj3" path="res://Scripts/Generation/StoredWorldInfo.gd" id="2_prkig"]
 [ext_resource type="Script" uid="uid://cfallqjcwjag0" path="res://Scripts/Generation/notices.gd" id="3_wx41w"]
+[ext_resource type="Texture2D" uid="uid://cm5mof204s0ji" path="res://Sprites/Controls-Sheet.png" id="4_prkig"]
+[ext_resource type="FontFile" uid="uid://mvjksgkkatqw" path="res://Fonts/joystix monospace.otf" id="5_72rhr"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_72rhr"]
+atlas = ExtResource("4_prkig")
+region = Rect2(0, 0, 512, 215)
+
+[sub_resource type="LabelSettings" id="LabelSettings_v33ov"]
+font = ExtResource("5_72rhr")
+font_size = 32
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_v33ov"]
+atlas = ExtResource("4_prkig")
+region = Rect2(0, 256, 512, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n4jc2"]
+atlas = ExtResource("4_prkig")
+region = Rect2(0, 512, 512, 256)
 
 [node name="Generator" type="Node3D"]
 script = ExtResource("1_xt47f")
@@ -16,17 +34,247 @@ metadata/_custom_type_script = "uid://2qhlpmpywhj3"
 
 [node name="UI" type="Control" parent="."]
 layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="ColorRect" type="ColorRect" parent="UI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+metadata/_edit_lock_ = true
+
+[node name="Notices" type="VBoxContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 423.0
+grow_vertical = 2
+alignment = 2
+script = ExtResource("3_wx41w")
+
+[node name="ArcadeControls" type="Control" parent="UI"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 150.0
+offset_top = -37.0
+offset_right = 231.0
+offset_bottom = 35.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Arcade" type="Sprite2D" parent="UI/ArcadeControls"]
+texture_filter = 1
+scale = Vector2(2.08605, 2.08605)
+texture = SubResource("AtlasTexture_72rhr")
+
+[node name="Accelerate" type="Label" parent="UI/ArcadeControls"]
+layout_mode = 0
+offset_left = -351.0
+offset_top = -200.0
+offset_right = -78.0
+offset_bottom = -152.0
+text = "Accelerate"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="Reverse" type="Label" parent="UI/ArcadeControls"]
+layout_mode = 0
+offset_left = 356.0
+offset_top = -198.0
+offset_right = 629.0
+offset_bottom = -150.0
+text = "Reverse"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="Handbrake" type="Label" parent="UI/ArcadeControls"]
+layout_mode = 0
+offset_left = 461.0
+offset_top = -101.0
+offset_right = 734.0
+offset_bottom = -53.0
+text = "Handbrake"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="TurnLeft" type="Label" parent="UI/ArcadeControls"]
+layout_mode = 0
+offset_left = -542.0
+offset_top = -14.0
+offset_right = -420.0
+offset_bottom = 67.0
+text = "TURN
+LEFT"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="TurnRight" type="Label" parent="UI/ArcadeControls"]
+layout_mode = 0
+offset_left = -170.0
+offset_top = -14.0
+offset_right = -37.0
+offset_bottom = 67.0
+text = "TURN
+RIGHT"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="ZoomOut" type="Label" parent="UI/ArcadeControls"]
+layout_mode = 0
+offset_left = -405.0
+offset_top = 169.0
+offset_right = -193.0
+offset_bottom = 250.0
+text = "ZOOM OUT"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="DesktopControls" type="Control" parent="UI"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 150.0
+offset_top = -37.0
+offset_right = 231.0
+offset_bottom = 35.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Keyboard" type="Sprite2D" parent="UI/DesktopControls"]
+texture_filter = 1
+position = Vector2(0, -167)
+scale = Vector2(2.08605, 2.08605)
+texture = SubResource("AtlasTexture_v33ov")
+
+[node name="Controller" type="Sprite2D" parent="UI/DesktopControls"]
+texture_filter = 1
+position = Vector2(0, 285)
+scale = Vector2(2.08605, 2.08605)
+texture = SubResource("AtlasTexture_n4jc2")
+
+[node name="KeyboardLabel" type="Control" parent="UI/DesktopControls"]
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="Notices" type="VBoxContainer" parent="UI"]
+[node name="Accelerate" type="Label" parent="UI/DesktopControls/KeyboardLabel"]
+offset_left = 285.0
+offset_top = -377.0
+offset_right = 558.0
+offset_bottom = -329.0
+text = "Accelerate"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="Reverse" type="Label" parent="UI/DesktopControls/KeyboardLabel"]
+offset_left = 296.0
+offset_top = -83.0
+offset_right = 569.0
+offset_bottom = -35.0
+text = "Reverse"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="Handbrake" type="Label" parent="UI/DesktopControls/KeyboardLabel"]
+offset_left = -267.0
+offset_top = -374.0
+offset_right = -28.0
+offset_bottom = -293.0
+text = "Handbrake"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="TurnLeft" type="Label" parent="UI/DesktopControls/KeyboardLabel"]
+offset_left = -73.0
+offset_top = -176.0
+offset_right = 49.0
+offset_bottom = -95.0
+text = "TURN
+LEFT"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="TurnRight" type="Label" parent="UI/DesktopControls/KeyboardLabel"]
+offset_left = 467.0
+offset_top = -182.0
+offset_right = 600.0
+offset_bottom = -101.0
+text = "TURN
+RIGHT"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="ZoomOut" type="Label" parent="UI/DesktopControls/KeyboardLabel"]
+offset_left = -279.0
+offset_top = -69.0
+offset_right = -67.0
+offset_bottom = 12.0
+text = "ZOOM OUT"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="ControllerLabel" type="Control" parent="UI/DesktopControls"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Accelerate" type="Label" parent="UI/DesktopControls/ControllerLabel"]
 layout_mode = 0
-offset_left = 4.0
-offset_top = 6.0
-offset_right = 180.0
-offset_bottom = 359.0
-alignment = 2
-script = ExtResource("3_wx41w")
+offset_left = 306.0
+offset_top = 444.0
+offset_right = 579.0
+offset_bottom = 492.0
+text = "Accelerate"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="Reverse" type="Label" parent="UI/DesktopControls/ControllerLabel"]
+layout_mode = 0
+offset_left = 407.0
+offset_top = 341.0
+offset_right = 680.0
+offset_bottom = 389.0
+text = "Reverse"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="Handbrake" type="Label" parent="UI/DesktopControls/ControllerLabel"]
+layout_mode = 0
+offset_left = -75.0
+offset_top = 383.0
+offset_right = 164.0
+offset_bottom = 464.0
+text = "Handbrake"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="TurnLeft" type="Label" parent="UI/DesktopControls/ControllerLabel"]
+layout_mode = 0
+offset_left = -551.0
+offset_top = 265.0
+offset_right = -429.0
+offset_bottom = 346.0
+text = "TURN
+LEFT"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="TurnRight" type="Label" parent="UI/DesktopControls/ControllerLabel"]
+layout_mode = 0
+offset_left = -142.0
+offset_top = 264.0
+offset_right = -9.0
+offset_bottom = 345.0
+text = "TURN
+RIGHT"
+label_settings = SubResource("LabelSettings_v33ov")
+
+[node name="ZoomOut" type="Label" parent="UI/DesktopControls/ControllerLabel"]
+layout_mode = 0
+offset_left = -389.0
+offset_top = 451.0
+offset_right = -177.0
+offset_bottom = 532.0
+text = "ZOOM OUT"
+label_settings = SubResource("LabelSettings_v33ov")
 
 [connection signal="event" from="." to="UI/Notices" method="_on_generator_event"]

@@ -1,10 +1,9 @@
-[gd_scene load_steps=15 format=3 uid="uid://c2qe472gc2y8l"]
+[gd_scene load_steps=14 format=3 uid="uid://c2qe472gc2y8l"]
 
 [ext_resource type="Script" uid="uid://egetfhucuy3b" path="res://Scripts/GameLoader.gd" id="1_2a8lj"]
 [ext_resource type="PackedScene" uid="uid://lvwwb7r05irj" path="res://Scenes/Generator.tscn" id="1_snns1"]
 [ext_resource type="Material" uid="uid://8uprxpao80pn" path="res://Material/water.tres" id="3_t5yij"]
 [ext_resource type="Script" uid="uid://c5hdigbxnwynf" path="res://Scripts/UIManage.gd" id="4_gd21k"]
-[ext_resource type="Script" uid="uid://e6lshyqfenrn" path="res://Scripts/DebugCamera.gd" id="4_nj47m"]
 [ext_resource type="FontFile" uid="uid://delhvnwvr5rin" path="res://Fonts/E1234.ttf" id="4_wvpkb"]
 [ext_resource type="FontFile" uid="uid://mvjksgkkatqw" path="res://Fonts/joystix monospace.otf" id="5_t5yij"]
 [ext_resource type="Texture2D" uid="uid://b1ss45g256c4j" path="res://Sprites/arrow.png" id="6_qo00e"]
@@ -60,10 +59,6 @@ directional_shadow_split_2 = 0.79
 directional_shadow_split_3 = 1.0
 directional_shadow_blend_splits = true
 directional_shadow_max_distance = 1000.0
-
-[node name="DebugCamera" type="Camera3D" parent="."]
-script = ExtResource("4_nj47m")
-base_move_speed = 20.0
 
 [node name="GameUI" type="Control" parent="."]
 layout_mode = 3
@@ -203,5 +198,3 @@ metadata/_edit_lock_ = true
 [connection signal="world_generated" from="Generator" to="." method="_on_generator_world_generated"]
 [connection signal="world_generated" from="Generator" to="Generator/UI/Notices" method="_on_generator_world_generated"]
 [connection signal="world_generated" from="Generator" to="GameUI" method="_on_generator_world_generated"]
-
-[editable path="Generator"]

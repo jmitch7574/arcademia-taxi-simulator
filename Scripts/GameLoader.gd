@@ -22,7 +22,6 @@ var taxi : Node3D
 const BUILDING_HIGHLIGHT = preload("res://Material/building-highlight.tres")
 const BUILDING = preload("res://Material/building.tres")
 
-@onready var debug_camera: Camera3D = $DebugCamera
 @onready var world_origin: StoredWorldInfo = $Generator/WorldOrigin
 @onready var generator: Generator = $Generator
 @onready var game_ui: UIManager = $GameUI
@@ -41,11 +40,6 @@ func _process(delta: float) -> void:
 		
 		if dist < 25 and taxi.linear_velocity.length() < 3:
 			complete_fare()
-	
-	if time < 0 or Input.is_action_just_pressed("end_game"):
-		get_tree().change_scene_to_file("res://Scenes/results.tscn")
-	if Input.is_action_just_pressed("more_time"):
-		time += 10
 
 func _on_generator_world_generated() -> void:
 	taxi = TAXI_PREFAB.instantiate()
@@ -53,7 +47,6 @@ func _on_generator_world_generated() -> void:
 	taxi.get_child(0).current = true
 	taxi.global_position = world_origin.spawn_point.global_position
 	taxi = taxi.get_child(1)
-	debug_camera.global_position = world_origin.spawn_point.global_position + Vector3(0, 450, 0)
 	game_ui.taxi = taxi
 	select_new_fare()
 		

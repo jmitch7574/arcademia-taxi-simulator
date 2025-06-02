@@ -5,6 +5,9 @@ extends Node3D
 ## Loads a GeoJson file and uses [CSGPolygon3D]s to create world features. 
 ## NOTE: Generator should be rotated 90 since CSGs are orientated weirdly by default
 
+@onready var arcade_controls: Control = $UI/ArcadeControls
+@onready var desktop_controls: Control = $UI/DesktopControls
+
 
 const LINCOLN = "res://GeoJson-Files/lincoln.geojson"
 
@@ -79,6 +82,14 @@ const PATH_MATCH = ["pedestrian", "steps", "footway"]
 
 
 func _ready() -> void:
+	## Display correct control scheme on loading screen
+	if OS.has_feature("arcade_release"):
+		desktop_controls.queue_free()
+	else:
+		arcade_controls.queue_free()
+	await gen_step()
+	
+	
 	FileLoader.load_file(LINCOLN) 		# Load data
 	
 	event.emit("Loaded File")			# Perform each generation task
