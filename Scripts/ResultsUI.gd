@@ -16,7 +16,7 @@ func _ready() -> void:
 	fare_amount.text = str(GameRoot.fare_count)
 	
 	if OS.has_feature("arcade_release"):
-		exit_hint.text = "Press D for Main Menu"
+		exit_hint.text = "Press F for Main Menu"
 	
 	if GameRoot.score >= 200:
 		final_rank.text = "S"

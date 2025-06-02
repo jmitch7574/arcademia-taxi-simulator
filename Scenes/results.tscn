@@ -267,7 +267,7 @@ offset_bottom = 647.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("1_i07ch")
 theme_override_font_sizes/font_size = 32
-text = "Press ESC for Main Menu"
+text = "Press ESC / (B) for Main Menu"
 label_settings = SubResource("LabelSettings_a5rne")
 vertical_alignment = 2
 
