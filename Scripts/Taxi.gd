@@ -7,7 +7,7 @@ extends VehicleBody3D
 
 var steering_strength:
 	get:
-		if Input.is_action_pressed(&"c_button"):
+		if Input.is_action_pressed(&"handbrake"):
 			return BASE_STEER / max((linear_velocity.length() * 2.5) / BASE_TOP_SPEED, 1)
 		else:
 			return BASE_STEER / max((linear_velocity.length() * 3) / BASE_TOP_SPEED, 1)
@@ -35,12 +35,12 @@ func _ready() -> void:
 	base_friction = front_left.wheel_friction_slip
 
 func _physics_process(delta: float) -> void:
-	steering = Input.get_axis("move_right", "move_left") * steering_strength
-	engine_force = Input.get_axis("b_button", "a_button") * BASE_POWER
+	steering = Input.get_axis(&"turn_right", &"turn_left") * steering_strength
+	engine_force = Input.get_axis(&"reverse", &"accelerate") * BASE_POWER
 	engine.pitch_scale = (linear_velocity.length() / BASE_TOP_SPEED) / 2
 	squeal.volume_db = -(BASE_TOP_SPEED) + linear_velocity.length()
 	
-	if (Input.is_action_pressed("c_button") and not are_all_wheels_off()):
+	if (Input.is_action_pressed(&"handbrake") and not are_all_wheels_off()):
 		skid_left_b.amount_ratio = 1
 		skid_right_b.amount_ratio = 1
 		skid_left_f.amount_ratio = 1
@@ -70,10 +70,6 @@ func _physics_process(delta: float) -> void:
 	if linear_velocity.length() > BASE_TOP_SPEED:
 		linear_velocity = linear_velocity.normalized() * BASE_TOP_SPEED
 	
-	if Input.is_action_just_pressed("reset_pos"):
-		position = Vector3(0, 5, 0)
-		rotation_degrees = Vector3(0, 0, 0)
-	
 	if are_all_wheels_off():
 		time_upside += delta
 		if time_upside > 4:
@@ -87,8 +83,8 @@ func _physics_process(delta: float) -> void:
 		position = Vector3(0, 5, 0)
 		rotation_degrees = Vector3(0, 0, 0)
 	
-	if Input.is_action_pressed(&"a_button") and Input.is_action_pressed(&"b_button"):
-		rotation_degrees.y += Input.get_axis("move_right", "move_left") * steering_strength * 2
+	if Input.is_action_pressed(&"accelerate") and Input.is_action_pressed(&"reverse"):
+		rotation_degrees.y += Input.get_axis(&"turn_right", &"turn_left") * steering_strength * 2
 		
 
 func are_all_wheels_off():

@@ -59,6 +59,7 @@ sky_rotation = Vector3(0, 0, -0.715585)
 render_priority = 0
 shader = ExtResource("2_txdwj")
 shader_parameter/multi = 1.05
+shader_parameter/offset = Vector3(0, 0, 0)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0jydw"]
 next_pass = SubResource("ShaderMaterial_hgjej")
@@ -266,7 +267,7 @@ offset_bottom = 647.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_fonts/font = ExtResource("1_i07ch")
 theme_override_font_sizes/font_size = 32
-text = "Press D for Main Menu"
+text = "Press ESC for Main Menu"
 label_settings = SubResource("LabelSettings_a5rne")
 vertical_alignment = 2
 
