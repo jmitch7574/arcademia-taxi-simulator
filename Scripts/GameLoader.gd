@@ -36,7 +36,7 @@ func _process(delta: float) -> void:
 	time -= delta
 	time_elapsed += delta
 	if taxi != null and current_building != null:
-		dist = taxi.global_position.distance_to(current_building.center)
+		dist = taxi.global_position.distance_to(current_building.get_closest_point(taxi.global_position))
 		
 		if dist < 25 and taxi.linear_velocity.length() < 3:
 			complete_fare()
