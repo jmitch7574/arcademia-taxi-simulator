@@ -26,12 +26,12 @@ void fragment() {
 
 	    noise_value = noise_value;
     	ALBEDO = roof_colour * noise_value * noise_strength;
-    } else { 
+    } else {
         float floorH = 8.0;
         float winW = 10.0;
         float floor = mod(world_position.y, floorH);
         float column = mod(world_position.x, winW);
-		
+
 		// Window appears near center of each floor and column
 		float is_floor_centered = step(1.0, abs(floor - floorH * 0.5));
 		float is_column_centered = step(1.5, abs(column - winW * 0.5));
